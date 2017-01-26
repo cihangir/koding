@@ -15,6 +15,9 @@ import (
 // swagger:model JMachine
 type JMachine struct {
 
+	// id
+	ID string `json:"_id,omitempty"`
+
 	// assignee
 	Assignee *JMachineAssignee `json:"assignee,omitempty"`
 
@@ -125,6 +128,9 @@ func (m *JMachine) validateAssignee(formats strfmt.Registry) error {
 	if m.Assignee != nil {
 
 		if err := m.Assignee.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("assignee")
+			}
 			return err
 		}
 	}
@@ -141,6 +147,9 @@ func (m *JMachine) validateGeneratedFrom(formats strfmt.Registry) error {
 	if m.GeneratedFrom != nil {
 
 		if err := m.GeneratedFrom.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("generatedFrom")
+			}
 			return err
 		}
 	}
@@ -152,6 +161,10 @@ func (m *JMachine) validateGroups(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Groups) { // not required
 		return nil
+	}
+
+	for i := 0; i < len(m.Groups); i++ {
+
 	}
 
 	return nil
@@ -184,6 +197,9 @@ func (m *JMachine) validateStatus(formats strfmt.Registry) error {
 	if m.Status != nil {
 
 		if err := m.Status.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("status")
+			}
 			return err
 		}
 	}
@@ -204,6 +220,10 @@ func (m *JMachine) validateUsers(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Users) { // not required
 		return nil
+	}
+
+	for i := 0; i < len(m.Users); i++ {
+
 	}
 
 	return nil

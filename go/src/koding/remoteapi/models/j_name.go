@@ -14,6 +14,9 @@ import (
 // swagger:model JName
 type JName struct {
 
+	// id
+	ID string `json:"_id,omitempty"`
+
 	// constructor name
 	ConstructorName string `json:"constructorName,omitempty"`
 
@@ -46,6 +49,10 @@ func (m *JName) validateSlugs(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Slugs) { // not required
 		return nil
+	}
+
+	for i := 0; i < len(m.Slugs); i++ {
+
 	}
 
 	return nil

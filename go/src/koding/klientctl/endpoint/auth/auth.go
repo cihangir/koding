@@ -4,9 +4,12 @@ import (
 	"sort"
 	"sync"
 
+	"koding/kites/config"
 	"koding/kites/kloud/stack"
 	"koding/klientctl/ctlcli"
 	"koding/klientctl/endpoint/kloud"
+	"koding/klientctl/endpoint/kontrol"
+	"koding/klientctl/helper"
 )
 
 var DefaultClient = &Client{}
@@ -16,9 +19,9 @@ type Session struct {
 	Team     string `json:"team"`
 }
 
-type Sessions map[string]Session
+type Sessions map[string]*Session
 
-func (s Sessions) Slice() []Session {
+func (s Sessions) Slice() []*Session {
 	keys := make([]string, 0, len(s))
 
 	for k := range s {
@@ -27,7 +30,7 @@ func (s Sessions) Slice() []Session {
 
 	sort.Strings(keys)
 
-	slice := make([]Session, 0, len(s))
+	slice := make([]*Session, 0, len(s))
 
 	for _, k := range keys {
 		slice = append(slice, s[k])
@@ -37,39 +40,92 @@ func (s Sessions) Slice() []Session {
 }
 
 type LoginOptions struct {
-	Team string
+	Team     string
+	Token    string
+	Username string
+	Password string
+}
+
+func (opts *LoginOptions) AskUserPass() (err error) {
+	opts.Username, err = helper.Ask("Username [%s]: ", config.CurrentUser.Username)
+	if err != nil {
+		return err
+	}
+
+	if opts.Username == "" {
+		opts.Username = config.CurrentUser.Username
+	}
+
+	for {
+		opts.Password, err = helper.AskSecret("Password [***]: ")
+		if err != nil {
+			return err
+		}
+		if opts.Password != "" {
+			break
+		}
+	}
+
+	return nil
 }
 
 type Client struct {
-	Kloud *kloud.Client
+	Kloud   *kloud.Client
+	Kontrol *kontrol.Client
 
 	once     sync.Once // for c.init()
 	sessions Sessions
 }
 
-func (c *Client) Login(opts *LoginOptions) (*Session, error) {
+func (c *Client) Login(opts *LoginOptions) (*stack.PasswordLoginResponse, error) {
 	c.init()
 
 	req := &stack.LoginRequest{
 		GroupName: opts.Team,
+		Metadata:  true,
 	}
 
-	var resp stack.LoginResponse
+	resp, err := stack.PasswordLoginResponse{}, error(nil)
 
 	// We ignore any cached session for the given login request,
 	// as it might be already invalid from a different client.
-	if err := c.kloud().Call("auth.login", req, &resp); err != nil {
+	if opts.Token != "" {
+		req := &kontrol.RegisterRequest{
+			AuthType: "token",
+			Token:    opts.Token,
+		}
+
+		err = c.kontrol().Call("registerMachine", req, &resp.KiteKey)
+	} else if opts.Username != "" && opts.Password != "" {
+		req := &stack.PasswordLoginRequest{
+			LoginRequest: *req,
+			Username:     opts.Username,
+			Password:     opts.Password,
+		}
+
+		err = c.kloud().Call("auth.passwordLogin", req, &resp)
+	} else {
+		err = c.kloud().Call("auth.login", req, &resp.LoginResponse)
+	}
+
+	if err != nil {
 		return nil, err
 	}
 
-	session := Session{
-		ClientID: resp.ClientID,
-		Team:     resp.GroupName,
+	if resp.GroupName != "" {
+		session := &Session{
+			ClientID: resp.ClientID,
+			Team:     resp.GroupName,
+		}
+
+		c.sessions[session.Team] = session
 	}
 
-	c.sessions[session.Team] = session
+	if resp.GroupName == "" {
+		resp.GroupName = opts.Team
+	}
 
-	return &session, nil
+	return &resp, nil
 }
 
 func (c *Client) Sessions() Sessions {
@@ -78,28 +134,10 @@ func (c *Client) Sessions() Sessions {
 	return c.sessions
 }
 
-func (c *Client) SetSession(team string, s Session) error {
+func (c *Client) Use(s *Session) {
 	c.init()
 
-	// update team session
-	c.sessions[team] = s
-
-	if err := c.kloud().Cache().SetValue("auth.sessions", c.sessions); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *Client) GetSession(team string) *Session {
-	c.init()
-
-	v, ok := c.sessions[team]
-	if !ok {
-		return nil
-	}
-
-	return &v
+	c.sessions[s.Team] = s
 }
 
 func (c *Client) Close() (err error) {
@@ -132,4 +170,12 @@ func (c *Client) kloud() *kloud.Client {
 	return kloud.DefaultClient
 }
 
-func Login(opts *LoginOptions) (*Session, error) { return DefaultClient.Login(opts) }
+func (c *Client) kontrol() *kontrol.Client {
+	if c.Kontrol != nil {
+		return c.Kontrol
+	}
+	return kontrol.DefaultClient
+}
+
+func Login(opts *LoginOptions) (*stack.PasswordLoginResponse, error) { return DefaultClient.Login(opts) }
+func Use(s *Session)                                                 { DefaultClient.Use(s) }

@@ -9,12 +9,17 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
 	"sync"
+
+	"github.com/koding/logging"
 )
 
 const maxBodyLen = 2 << 20 // 2 MiB
+
+var defaultLog = logging.NewCustom("api-transport", false)
 
 // contextKey is a value for use with context.WithValue.
 type contextKey struct {
@@ -67,14 +72,34 @@ func (s *Session) Valid() error {
 	return nil
 }
 
-func (s *Session) writeTo(req *http.Request) {
+// WriteTo writes the s session to the given requeest.
+func (s *Session) WriteTo(req *http.Request) {
 	req.Header.Set("Authorization", "Bearer "+s.ClientID)
 }
 
-func (s *Session) readFrom(req *http.Request) {
+// ReadFrom initializes the s session by reading it from
+// the given request.
+//
+// If no session can be read from req, the method is a nop.
+func (s *Session) ReadFrom(req *http.Request) {
 	if auth := req.Header.Get("Authorization"); strings.HasPrefix(auth, "Bearer ") {
 		s.ClientID = auth[len("Bearer "):]
 	}
+}
+
+// Match tests whether the other session matches the s one.
+//
+// Since ClientID is typically auto-generated, we match all the other fields.
+func (s *Session) Match(other *Session) error {
+	if s.User.Username != other.User.Username {
+		return fmt.Errorf("username is  %q, the other one is %q", s.User.Username, other.User.Username)
+	}
+
+	if s.User.Team != other.User.Team {
+		return fmt.Errorf("team is  %q, the other one is %q", s.User.Team, other.User.Team)
+	}
+
+	return nil
 }
 
 // AuthFunc is used to fetch session information.
@@ -130,11 +155,13 @@ var _ io.ReadSeeker = nopCloser{bytes.NewReader(nil)}
 // Transport is a signing transport that
 // authorizes each request with jSession.clientId.
 type Transport struct {
-	http.RoundTripper          // a transport to use; optional, by default http.DefaultClient.Transport
-	AuthFunc          AuthFunc // clientID authorisation to use; required
-	UserFunc          UserFunc // used to get a user from request to authenticate for; by default looked up with UserContextKey
-	Host              string   // original Host name, overwrites req.Host; optional
-	RetryNum          int      // number of retries in case of temporary failures; optional, by default 3
+	http.RoundTripper                // a transport to use; optional, by default http.DefaultClient.Transport
+	AuthFunc          AuthFunc       // clientID authorisation to use; required
+	UserFunc          UserFunc       // used to get a user from request to authenticate for; by default looked up with UserContextKey
+	Host              string         // original Host name, overwrites req.Host; optional
+	RetryNum          int            // number of retries in case of temporary failures; optional, by default 3
+	Log               logging.Logger // logger to use
+	Debug             bool           // whether to dump HTTP request/response
 
 	// request mapping implementation stolen from:
 	//
@@ -158,11 +185,18 @@ func (t *Transport) NewSingleUser(u *User) http.RoundTripper {
 		UserFunc:     func(*http.Request) *User { return u },
 		Host:         t.Host,
 		RetryNum:     t.RetryNum,
+		Log:          t.Log,
+		Debug:        t.Debug,
 	}
 }
 
 // RoundTrip implements the http.RoundTripper interface.
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	type body interface {
+		io.ReadSeeker
+		io.Closer
+	}
+
 	user := t.user(req)
 	if user == nil {
 		return t.roundTripper().RoundTrip(req)
@@ -171,16 +205,19 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	reqCopy := copyRequest(req) // per RoundTripper contract
 	t.setModReq(req, reqCopy)
 
-	switch reqCopy.Body.(type) {
+	var save body
+
+	switch b := reqCopy.Body.(type) {
 	case nil:
-	case io.ReadSeeker:
+	case body:
+		save = b
 	default:
 		p, err := ioutil.ReadAll(io.LimitReader(reqCopy.Body, maxBodyLen))
 		if err != nil {
 			return nil, err // non-retryable
 		}
 
-		reqCopy.Body = nopCloser{bytes.NewReader(p)}
+		save = nopCloser{bytes.NewReader(p)}
 	}
 
 	var refresh bool
@@ -189,9 +226,17 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	for attempts := t.retryNum(); attempts >= 0; attempts-- {
 		if reqCopy.Body != nil {
-			if _, err := reqCopy.Body.(io.ReadSeeker).Seek(0, io.SeekStart); err != nil {
+			rewind := save
+
+			if b, ok := reqCopy.Body.(body); ok {
+				rewind = b
+			}
+
+			if _, err := rewind.Seek(0, io.SeekStart); err != nil {
 				return nil, err // non-retryable
 			}
+
+			reqCopy.Body = rewind
 		}
 
 		opts := &AuthOptions{
@@ -202,6 +247,9 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		}
 
 		s, err := t.AuthFunc(opts)
+
+		t.log().Debug("AuthFunc(%+v): session=%+v, error=%v", opts, s, err)
+
 		if err != nil {
 			return nil, err // non-retryable
 		}
@@ -213,13 +261,24 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		session = s
 		refresh = false
 
-		session.writeTo(reqCopy)
+		session.WriteTo(reqCopy)
 
 		if t.Host != "" {
 			reqCopy.Host = t.Host
 		}
 
+		if t.Debug {
+			p, err := httputil.DumpRequestOut(reqCopy, true)
+			t.log().Debug("[request] %s (err=%v)", p, err)
+		}
+
 		resp, err := t.roundTripper().RoundTrip(reqCopy)
+
+		if t.Debug && err == nil {
+			p, err := httputil.DumpResponse(resp, true)
+			t.log().Debug("[response] %s (err=%v)", p, err)
+		}
+
 		if e, ok := err.(net.Error); ok && (e.Temporary() || e.Timeout()) {
 			lastErr = err
 			continue // retry
@@ -230,7 +289,13 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 			return nil, err // non-retryable
 		}
 
-		if resp.StatusCode == http.StatusUnauthorized {
+		switch resp.StatusCode {
+		case http.StatusInternalServerError:
+			// TODO(rjeczalik): remove, this is a temporary workaround
+			// for remote.api, that return 500 when session could not
+			// be validated.
+			fallthrough
+		case http.StatusUnauthorized:
 			resp.Body.Close()
 			lastErr = errors.New(http.StatusText(resp.StatusCode))
 			refresh = true
@@ -292,6 +357,13 @@ func (t *Transport) retryNum() int {
 		return t.RetryNum
 	}
 	return 3
+}
+
+func (t *Transport) log() logging.Logger {
+	if t.Log != nil {
+		return t.Log
+	}
+	return defaultLog
 }
 
 func (t *Transport) setModReq(orig, mod *http.Request) {

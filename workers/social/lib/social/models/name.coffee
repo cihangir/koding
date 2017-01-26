@@ -7,8 +7,6 @@ module.exports = class JName extends Model
 
   { secure, JsPath:{ getAt }, signature } = require 'bongo'
 
-  { v4: createId } = require 'node-uuid'
-
   @share()
 
   @set
@@ -33,37 +31,6 @@ module.exports = class JName extends Model
     registeredAt      :
       type            : Date
       default         : -> new Date
-
-  @cycleSecretName = (name, callback) ->
-    JSecretName = require './secretname'
-    JSecretName.one { name }, (err, secretNameObj) ->
-      if err then callback err
-      else unless secretNameObj?
-        callback new KodingError "Unknown name #{name} (Maybe non of the participants are using Broker anymore)"
-      else
-        oldSecretName = secretNameObj.secretName
-        secretName    = createId()
-        secretNameObj.update {
-          $set: { oldSecretName, secretName }
-        }, -> callback null, oldSecretName, secretName
-        setTimeout ->
-          secretNameObj.update { $unset: { oldSecretName: 1 } }, ->
-        , 5000
-
-  @fetchSecretName = (name, callback) ->
-    JSecretName = require './secretname'
-    JSecretName.one { name }, (err, secretNameObj) ->
-      if err then callback err
-      else unless secretNameObj
-        secretNameObj = new JSecretName { name }
-        secretNameObj.save (err) ->
-          if err then callback err
-          else callback null, secretNameObj.secretName
-      else
-        # TODO: we could possibly try to create the conversation slice by
-        #  observing an event that we could emit from here.
-        #@emit 'channel-control'
-        callback null, secretNameObj.secretName, secretNameObj.oldSecretName
 
   stripTemplate = (konstructor, nameStr) ->
     { slugTemplate } = konstructor#Base.constructors[@constructorName]
@@ -137,11 +104,10 @@ module.exports = class JName extends Model
 
     isEmailValid = require './user/emailchecker'
     sanitize     = require './user/emailsanitize'
-    { check }    = require 'validator'
+    validator    = require 'validator'
+    candidate    = sanitize candidate
 
-    candidate = sanitize candidate
-
-    return check(candidate).isEmail() and isEmailValid candidate
+    return validator.isEmail(candidate) and isEmailValid candidate
 
 
   @claimNames = secure (client, callback = -> ) ->

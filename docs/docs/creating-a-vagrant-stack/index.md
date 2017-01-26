@@ -7,7 +7,7 @@ parent: /docs/home
 
 # {{ page.title }}
 
-# Vagrant Stack
+## Introduction
 
 This guide will help you create a Vagrant stack. A Vagrant stack will use your local machine to host your VM. Vagrant works by using [virtual box][1] on your local or remote machine to create VMs. [Learn more about Vagrant here][2].
 
@@ -57,7 +57,7 @@ It is recommended that you choose the Vagrant stack if you have access to a phys
 
     >You can add commands to run once your VM starts under the **user_data** section. For example you can choose to install services/packages once a VM starts. Commands under the **user_data** section will run as `root` when the VM boots.
 
-    >Click away from any of the tabs to return to your **Stack template editor**.
+    >Click on the stack name to return to your **Stack template editor**.
 
 7.  Edit your **Readme** section to greet your team and provide them with information or instructions. You can use [markdown](https://en.wikipedia.org/wiki/Markdown) format
 
@@ -137,8 +137,8 @@ This is an example stack script with more&nbsp;configuration options that you ca
 [2]: https://www.vagrantup.com/about.html
 [3]: {{ site.url }}/assets/img/guides/vagrant/install-kd.png
 [4]: {{ site.url }}/assets/img/guides/vagrant/kite-query-id.png
-[5]: {{ site.url }}/assets/img/guides/click-stacks.png
-[6]: {{ site.url }}/assets/img/guides/click-new-stack.png
+[5]: {{ site.url }}/assets/img/guides/azure/click-stacks.png
+[6]: {{ site.url }}/assets/img/guides/azure/click-new-stack.png
 [7]: {{ site.url }}/assets/img/guides/vagrant/vagrant-provider.png
 [8]: {{ site.url }}/assets/img/guides/vagrant/vagrant-create-stack.png
 [9]: {{ site.url }}/assets/img/guides/vagrant/vagrant-readme.png

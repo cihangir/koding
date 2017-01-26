@@ -28,11 +28,7 @@ module.exports = class JGroup extends Module
     { permission: 'edit own groups', validateWith: Validators.group.admin }
   ]
 
-  @API_TOKEN_LIMIT = 5
-
   @trait __dirname, '../../traits/filterable'
-  @trait __dirname, '../../traits/followable'
-  @trait __dirname, '../../traits/taggable'
   @trait __dirname, '../../traits/protected'
   @trait __dirname, '../../traits/joinable'
   @trait __dirname, '../../traits/slugifiable'
@@ -79,20 +75,6 @@ module.exports = class JGroup extends Module
       'delete own channel'      : ['member']
       'delete channel'          : ['member', 'moderator']
 
-      # JTag related permissions
-      'read tags'               : ['member', 'moderator']
-      'create tags'             : ['member', 'moderator']
-      'freetag content'         : ['member', 'moderator']
-      'browse content by tag'   : ['member', 'moderator']
-      'edit tags'               : ['moderator']
-      'delete tags'             : ['moderator']
-      'edit own tags'           : ['moderator']
-      'delete own tags'         : ['moderator']
-      'assign system tag'       : ['moderator']
-      'fetch system tag'        : ['moderator']
-      'create system tag'       : ['moderator']
-      'remove system tag'       : ['moderator']
-      'create synonym tags'     : ['moderator']
     indexes         :
       slug          : 'unique'
     sharedEvents    :
@@ -260,6 +242,7 @@ module.exports = class JGroup extends Module
         type        : String
         validate    : require('../name').validateName
         set         : (value) -> value.toLowerCase()
+        cacheable   : yes
       privacy       :
         type        : String
         enum        : ['invalid privacy type', [
@@ -273,10 +256,6 @@ module.exports = class JGroup extends Module
           'hidden'
         ]]
       # parent        : ObjectRef
-      counts        :
-        members     :
-          type      : Number
-          default   : -> 1
       customize     :
         coverPhoto  : String
         logo        : String
@@ -305,7 +284,7 @@ module.exports = class JGroup extends Module
 
     broadcastableRelationships : [
       'member', 'moderator', 'admin'
-      'owner', 'tag', 'role'
+      'owner', 'role'
     ]
     relationships : ->
       JAccount    = require '../account'
@@ -387,12 +366,10 @@ module.exports = class JGroup extends Module
   @render        :
     loggedIn     :
       kodingHome : require '../../render/loggedin/kodinghome'
-      groupHome  : require '../../render/loggedin/grouphome'
-      subPage    : require '../../render/loggedin/subpage'
+      groupHome  : require '../../render/loggedin/kodinghome'
     loggedOut    :
-      groupHome  : require '../../render/loggedout/grouphome'
+      groupHome  : require '../../render/loggedout/kodinghome'
       kodingHome : require '../../render/loggedout/kodinghome'
-      subPage    : require '../../render/loggedout/subpage'
 
 
   prepareNewlyAddedMember: (member, callback) ->
@@ -497,18 +474,8 @@ module.exports = class JGroup extends Module
 
   @create$ = secure (client, formData, callback) ->
     { delegate } = client.connection
-
-    # subOptions = targetOptions: selector: tags: "custom-plan"
-    # delegate.fetchSubscription null, subOptions, (err, subscription) =>
-    #   return callback err  if err
-    #   return callback new KodingError "Subscription is not found"  unless subscription
-    #   subscription.debitPack tag: "group", (err) =>
-    #     return callback err  if err
     @create client, formData, delegate, (err, group) ->
-      return callback err if err
-      # group.addSubscription subscription, (err) ->
-      #   return callback err  if err
-      callback null, { group }
+      return callback err, group
 
   @findSuggestions = (client, seed, options, callback) ->
     { limit, blacklist, skip }  = options
@@ -528,14 +495,6 @@ module.exports = class JGroup extends Module
   # make sense to allow this method based on current group's permissions
   @byRelevance$ = secure (client, seed, options, callback) ->
     @byRelevance client, seed, options, callback
-
-  @fetchSecretChannelName = (groupSlug, callback) ->
-    JName = require '../name'
-    JName.fetchSecretName groupSlug, (err, secretName, oldSecretName) ->
-      if err then callback err
-      else callback null, "group.secret.#{secretName}",
-        if oldSecretName then "group.secret.#{oldSecretName}"
-
 
   fetchData: (callback) ->
 
@@ -667,19 +626,19 @@ module.exports = class JGroup extends Module
               next()
 
           (next) ->
-            notifyAccountOnRoleChange client, targetId, roles, next
-
+            notifyGroupOnRoleChange client, targetId, roles, next
         ]
 
         async.series queue, callback
 
-  notifyAccountOnRoleChange = (client, id, roles, callback) ->
-    JAccount.one { _id: id }, (err, account) ->
-      return callback err  if err or not account
+  notifyGroupOnRoleChange = (client, id, roles, callback) ->
+
+    JGroup.one { slug : client.context.group }, (err, group) ->
+      return callback err  if err or not group
 
       role = if roles?.length > 0 then roles[0] else 'member'
-      contents = { role, group: client.context.group, adminNick: client.connection.delegate.profile.nickname }
-      account.sendNotification 'MembershipRoleChanged', contents
+      contents = { role, id, group: client.context.group, adminNick: client.connection.delegate.profile.nickname }
+      group.sendNotification 'MembershipRoleChanged', contents
       callback null
 
 
@@ -950,11 +909,11 @@ module.exports = class JGroup extends Module
     advanced: PERMISSION_EDIT_GROUPS
     success: (client, callback) ->
       JApiToken = require '../apitoken'
-      selector  = { group : @getAt 'slug' }
+      selector  = { group: @getAt 'slug' }
 
       JApiToken.some selector, {}, (err, apiTokens) ->
         return callback err, []  if err or not apiTokens
-        JGroup.mergeApiTokensWithUsername apiTokens, callback
+        JGroup.mergeApiTokensWithUsername client, apiTokens, callback
 
 
   baseFetcherOfGroupStaff: (options) ->
@@ -1029,29 +988,6 @@ module.exports = class JGroup extends Module
         options.targetOptions = { options, selector }
 
         @fetchMembers {}, options, callback
-
-
-  fetchHomepageView: (options, callback) ->
-    { account, section } = options
-    kallback = =>
-      homePageOptions = extend options, {
-        @slug
-        @title
-        @avatar
-        @body
-        @counts
-        @customize
-      }
-      prefix = if account?.type is 'unregistered' then 'loggedOut' else 'loggedIn'
-      JGroup.render[prefix].groupHome homePageOptions, callback
-
-    if @visibility is 'hidden' and section isnt 'Invitation'
-      @isMember account, (err, isMember) ->
-        return callback err if err
-        if isMember then kallback()
-        else do callback
-    else
-      kallback()
 
 
   # modifies JGroupData related with the JGroup instance
@@ -1289,6 +1225,15 @@ module.exports = class JGroup extends Module
       else callback null, (if count is 0 then no else yes)
 
 
+  countMembers: (callback) ->
+    selector =
+      as         : 'member'
+      targetName : 'JAccount'
+      sourceId   : @getId()
+      sourceName : 'JGroup'
+    Relationship.count selector, callback
+
+
   approveMember:(member, roles, callback) ->
     [callback, roles] = [roles, callback]  unless callback
     roles ?= ['member']
@@ -1299,7 +1244,6 @@ module.exports = class JGroup extends Module
 
       kallback = =>
         callback()
-        @updateCounts()
         @emit 'MemberAdded', member  if 'member' in roles
 
       queue = roles.map (role) => (fin) =>
@@ -1328,21 +1272,6 @@ module.exports = class JGroup extends Module
           if err then callback err
           else unless request? then callback null, ['guest']
           else callback null, ["invitation-#{request.status}"]
-
-
-  updateCounts: ->
-    # remove this guest shit if required
-    if @getId().toString() is '51f41f195f07655e560001c1'
-      return
-
-    Relationship.count
-      as         : 'member'
-      targetName : 'JAccount'
-      sourceId   : @getId()
-      sourceName : 'JGroup'
-    , (err, count) =>
-      @update ({ $set: { 'counts.members': count } }), ->
-
 
   leave$: secure (client, options, callback) ->
 
@@ -1376,7 +1305,6 @@ module.exports = class JGroup extends Module
       Joinable = require '../../traits/joinable'
 
       kallback = (err) =>
-        @updateCounts()
 
         { profile: { nickname } } = client.connection.delegate
 
@@ -1433,9 +1361,8 @@ module.exports = class JGroup extends Module
             }, (err) -> callback err
 
           queue = roles.map (role) => (fin) =>
-            @removeMember account, role, (err) =>
+            @removeMember account, role, (err) ->
               return fin err  if err
-              @updateCounts()
               fin()
 
           # add current user into blocked accounts
@@ -1502,8 +1429,7 @@ module.exports = class JGroup extends Module
           @fetchRolesByAccount account, (err, newOwnersRoles) =>
             return callback err if err
 
-            kallback = (err) =>
-              @updateCounts()
+            kallback = (err) ->
               callback err
 
             # give rights to new owner
@@ -1603,11 +1529,6 @@ module.exports = class JGroup extends Module
           JInvitation = require '../invitation'
           JInvitation.remove { groupName: @slug }, (err) ->
             next err
-
-        (next) =>
-          @fetchTags (err, tags) ->
-            JTag = require '../tag'
-            removeHelperMany JTag, tags, err, next
 
         (next) =>
           ComputeProvider = require '../computeproviders/computeprovider'
@@ -1783,18 +1704,28 @@ module.exports = class JGroup extends Module
       return callback null, accounts
 
 
-  @mergeApiTokensWithUsername: (apiTokens, callback) ->
+  SHADOW_CODE = '*'
 
+  @mergeApiTokensWithUsername: (client, apiTokens, callback) ->
+
+    originId  = client.connection.delegate.getId()
     JAccount  = require '../account'
     originIds = apiTokens.map (apiToken) -> apiToken.originId
 
     JAccount.some { _id: { $in: originIds } }, {}, (err, accounts) ->
       return callback err, []  if err or not accounts
 
-      accounts.forEach (account) ->
-        apiTokens.forEach (apiToken) ->
-          if account._id.toString() is apiToken.originId.toString?()
+      apiTokens = apiTokens.map (apiToken) ->
+
+        if not apiToken.originId.equals originId
+          apiToken.code = SHADOW_CODE
+        accounts.forEach (account) ->
+          if account._id.equals apiToken.originId
             apiToken.username = account.profile.nickname
+        return apiToken
+
+      .sort (apiToken) ->
+        not apiToken.originId.equals originId
 
       return callback null, apiTokens
 

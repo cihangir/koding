@@ -31,7 +31,7 @@
       "name": "JCombinedAppStorage"
     },
     {
-      "description": "Base class for compute related operations",
+      "description": "Model ComputeProvider",
       "name": "ComputeProvider"
     },
     {
@@ -41,6 +41,10 @@
     {
       "description": "Model JCredentialData",
       "name": "JCredentialData"
+    },
+    {
+      "description": "Model Kloud",
+      "name": "Kloud"
     },
     {
       "description": "Model JMachine",
@@ -115,18 +119,6 @@
       "name": "JInvitation"
     },
     {
-      "description": "Model JKite",
-      "name": "JKite"
-    },
-    {
-      "description": "Model JLocation",
-      "name": "JLocation"
-    },
-    {
-      "description": "Model JLocationState",
-      "name": "JLocationState"
-    },
-    {
       "description": "Model JLog",
       "name": "JLog"
     },
@@ -141,10 +133,6 @@
     {
       "description": "Model JPasswordRecovery",
       "name": "JPasswordRecovery"
-    },
-    {
-      "description": "Model Payment",
-      "name": "Payment"
     },
     {
       "description": "Model JProxyFilter",
@@ -169,10 +157,6 @@
     {
       "description": "Model S3",
       "name": "S3"
-    },
-    {
-      "description": "Model JSecretName",
-      "name": "JSecretName"
     },
     {
       "description": "Model JSession",
@@ -207,16 +191,12 @@
       "name": "SocialNotification"
     },
     {
-      "description": "SocialAccount",
+      "description": "Model SocialAccount",
       "name": "SocialAccount"
     },
     {
-      "description": "JComputeStack keeps stack data\nincluding machines and credential references",
+      "description": "Model JComputeStack",
       "name": "JComputeStack"
-    },
-    {
-      "description": "Model JTag",
-      "name": "JTag"
     },
     {
       "description": "Model JTeamInvitation",
@@ -264,14 +244,7 @@
       }
     },
     "DefaultSelector": {
-      "type": "object",
-      "properties": {
-        "_id": {
-          "type": "string",
-          "description": "Mongo Object ID",
-          "example": "582c21d43bf248161538450b"
-        }
-      }
+      "type": "object"
     },
     "DefaultResponse": {
       "type": "object",
@@ -319,6 +292,9 @@
     "JAccount": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "socialApiId": {
           "type": "string"
         },
@@ -375,6 +351,9 @@
         "originId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "code": {
           "type": "string"
         },
@@ -393,6 +372,9 @@
     "JCombinedAppStorage": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "accountId": {
           "type": "string"
         },
@@ -410,6 +392,9 @@
         "originId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "provider": {
           "type": "string"
         },
@@ -446,6 +431,9 @@
         "originId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "identifier": {
           "type": "string"
         },
@@ -464,6 +452,9 @@
         "provider"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "uid": {
           "type": "string"
         },
@@ -557,6 +548,9 @@
         "originId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "slug": {
           "type": "string"
         },
@@ -589,6 +583,9 @@
     "JSnapshot": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "originId": {
           "type": "string"
         },
@@ -617,10 +614,14 @@
       "type": "object",
       "required": [
         "title",
+        "slug",
         "originId",
         "group"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "machines": {
           "type": "array",
           "items": {
@@ -630,6 +631,10 @@
         "title": {
           "type": "string",
           "description": "Title of this stack template"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Unique slug of stack template"
         },
         "description": {
           "type": "string",
@@ -682,6 +687,9 @@
         "namespace"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "namespace": {
           "type": "string"
         },
@@ -696,6 +704,9 @@
     "JCustomPartials": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -730,6 +741,9 @@
     "JProposedDomain": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "domain": {
           "type": "string"
         },
@@ -769,6 +783,9 @@
     "JDomainAlias": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "domain": {
           "type": "string"
         },
@@ -793,6 +810,9 @@
         "foreignId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "username": {
           "type": "string"
         },
@@ -813,6 +833,9 @@
     "JGroupData": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "slug": {
           "type": "string"
         },
@@ -824,6 +847,9 @@
     "JGroupLimit": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -881,6 +907,9 @@
         "title"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -907,13 +936,6 @@
         },
         "visibility": {
           "type": "string"
-        },
-        "counts": {
-          "properties": {
-            "members": {
-              "type": "number"
-            }
-          }
         },
         "customize": {
           "properties": {
@@ -963,6 +985,9 @@
     "JPermissionSet": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "isCustom": {
           "type": "boolean"
         },
@@ -977,6 +1002,9 @@
     "JGroupRole": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -1000,6 +1028,9 @@
         "groupName"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "code": {
           "type": "string"
         },
@@ -1037,61 +1068,6 @@
         }
       }
     },
-    "JKite": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "manifest": {
-          "type": "object"
-        },
-        "kiteCode": {
-          "type": "string"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date"
-        }
-      }
-    },
-    "JLocation": {
-      "type": "object",
-      "properties": {
-        "zip": {
-          "type": "string"
-        },
-        "city": {
-          "type": "string"
-        },
-        "state": {
-          "type": "string"
-        },
-        "stateCode": {
-          "type": "string"
-        },
-        "county": {
-          "type": "string"
-        },
-        "countryCode": {
-          "type": "string"
-        }
-      }
-    },
-    "JLocationState": {
-      "type": "object",
-      "properties": {
-        "countryCode": {
-          "type": "string"
-        },
-        "stateCode": {
-          "type": "string"
-        },
-        "state": {
-          "type": "string"
-        }
-      }
-    },
     "JLog": {
       "type": "object",
       "required": [
@@ -1100,6 +1076,9 @@
         "username"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "type": {
           "type": "string"
         },
@@ -1127,6 +1106,9 @@
     "JName": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -1147,6 +1129,9 @@
     "JPasswordRecovery": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "email": {
           "type": "string"
         },
@@ -1182,6 +1167,9 @@
         "name"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -1207,6 +1195,9 @@
     "JProxyRestriction": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "domainName": {
           "type": "string"
         },
@@ -1235,6 +1226,9 @@
         "originId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "originId": {
           "type": "string"
         },
@@ -1255,6 +1249,9 @@
         "originId"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "type": {
           "type": "string"
         },
@@ -1288,6 +1285,9 @@
         "name"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -1329,23 +1329,12 @@
         }
       }
     },
-    "JSecretName": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "secretName": {
-          "type": "string"
-        },
-        "oldSecretName": {
-          "type": "string"
-        }
-      }
-    },
     "JSession": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "clientId": {
           "type": "string"
         },
@@ -1417,6 +1406,9 @@
         "group"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "title": {
           "type": "string"
         },
@@ -1460,54 +1452,6 @@
         }
       }
     },
-    "JTag": {
-      "type": "object",
-      "required": [
-        "title"
-      ],
-      "properties": {
-        "title": {
-          "type": "string"
-        },
-        "slug": {
-          "type": "string"
-        },
-        "body": {
-          "type": "string"
-        },
-        "counts": {
-          "properties": {
-            "followers": {
-              "type": "number"
-            },
-            "following": {
-              "type": "number"
-            },
-            "tagged": {
-              "type": "number"
-            }
-          }
-        },
-        "meta": {
-          "type": "object"
-        },
-        "synonyms": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "group": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string"
-        },
-        "category": {
-          "type": "string"
-        }
-      }
-    },
     "JTeamInvitation": {
       "type": "object",
       "required": [
@@ -1515,6 +1459,9 @@
         "email"
       ],
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "code": {
           "type": "string"
         },
@@ -1536,6 +1483,9 @@
     "JUrlAlias": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "alias": {
           "type": "string"
         },
@@ -1547,6 +1497,9 @@
     "JUser": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "username": {
           "type": "string"
         },
@@ -1613,6 +1566,9 @@
     "JVerificationToken": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "username": {
           "type": "string"
         },
@@ -1634,6 +1590,9 @@
     "JWorkspace": {
       "type": "object",
       "properties": {
+        "_id": {
+          "type": "string"
+        },
         "name": {
           "type": "string"
         },
@@ -1947,13 +1906,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -1971,13 +1940,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -1995,13 +1974,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2019,13 +2008,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2043,13 +2042,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2067,13 +2076,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2091,13 +2110,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2115,13 +2144,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2139,13 +2178,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2163,13 +2212,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2187,13 +2246,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2211,13 +2280,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2235,13 +2314,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2259,13 +2348,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2283,13 +2382,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2307,13 +2416,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2331,13 +2450,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2355,13 +2484,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2379,13 +2518,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2403,13 +2552,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2427,37 +2586,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JAccount"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JAccount.fetchSubscriptions/{id}": {
-      "post": {
-        "tags": [
-          "JAccount"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
+          },
           {
-            "$ref": "#/parameters/instanceParam"
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2475,13 +2620,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2499,13 +2654,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2523,13 +2688,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2547,13 +2722,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2571,13 +2756,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2595,13 +2790,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2619,13 +2824,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2643,13 +2858,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2667,13 +2892,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2691,13 +2926,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2715,13 +2960,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2739,13 +2994,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JAccount"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JAccount"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2789,13 +3054,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JApiToken"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JApiToken"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -2903,13 +3178,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCombinedAppStorage"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCombinedAppStorage"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3018,9 +3303,9 @@
         "description": "creates a JMachine for requested provider with the provided options",
         "responses": {
           "200": {
-            "description": "Request processed succesfully",
+            "description": "created JMachine instance",
             "schema": {
-              "$ref": "#/definitions/DefaultResponse"
+              "$ref": "#/definitions/JMachine"
             }
           },
           "401": {
@@ -3362,13 +3647,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3386,13 +3681,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3410,13 +3715,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3434,13 +3749,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3458,13 +3783,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3482,13 +3817,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3506,13 +3851,49 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCredential"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCredential"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/remote.api/Kloud.ping": {
+      "post": {
+        "tags": [
+          "Kloud"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [],
+        "description": "calls kite.ping on Kloud on behalf of loggedin user",
+        "responses": {
+          "200": {
+            "description": "Request processed succesfully",
+            "schema": {
+              "$ref": "#/definitions/DefaultResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized request",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedRequest"
             }
           }
         }
@@ -3590,13 +3971,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3614,13 +4005,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3638,13 +4039,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3662,13 +4073,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3686,13 +4107,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3710,13 +4141,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3734,13 +4175,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3758,13 +4209,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JMachine"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JMachine"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3872,13 +4333,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProvisioner"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProvisioner"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3896,13 +4367,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProvisioner"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProvisioner"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -3920,13 +4401,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProvisioner"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProvisioner"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4004,13 +4495,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JSnapshot"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JSnapshot"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4026,15 +4527,104 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/bodyParam"
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "template": {
+                  "type": "string",
+                  "default": "{\"provider\": {\"aws\": {}}}"
+                },
+                "title": {
+                  "type": "string",
+                  "default": "My AWS template"
+                },
+                "credentials": {
+                  "type": "object",
+                  "properties": {}
+                },
+                "config": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "required": true,
+            "description": "body of the request"
           }
         ],
-        "description": "",
+        "description": "creates a JStackTemplate with requested content",
         "responses": {
           "200": {
-            "description": "Request processed succesfully",
+            "description": "created JStackTemplate instance",
             "schema": {
-              "$ref": "#/definitions/DefaultResponse"
+              "$ref": "#/definitions/JStackTemplate"
+            }
+          },
+          "401": {
+            "description": "Unauthorized request",
+            "schema": {
+              "$ref": "#/definitions/UnauthorizedRequest"
+            }
+          }
+        }
+      }
+    },
+    "/remote.api/JStackTemplate.samples": {
+      "post": {
+        "tags": [
+          "JStackTemplate"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "default": "aws"
+                },
+                "useDefaults": {
+                  "type": "boolean",
+                  "default": true
+                }
+              }
+            },
+            "required": true,
+            "description": "body of the request"
+          }
+        ],
+        "description": "returns sample stack template for given provider",
+        "responses": {
+          "200": {
+            "description": "stacktemplate sample in json and yaml format with default values",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "json": {
+                  "type": "string",
+                  "default": "{}"
+                },
+                "yaml": {
+                  "type": "string",
+                  "default": "--"
+                },
+                "defaults": {
+                  "type": "object",
+                  "properties": {
+                    "userInputs": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  }
+                }
+              }
             }
           },
           "401": {
@@ -4118,13 +4708,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4142,13 +4742,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4166,13 +4776,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4190,13 +4810,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4214,13 +4844,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4238,13 +4878,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4262,13 +4912,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JStackTemplate"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JStackTemplate"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4346,13 +5006,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCustomPartials"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCustomPartials"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4370,13 +5040,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JCustomPartials"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JCustomPartials"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4540,13 +5220,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProposedDomain"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProposedDomain"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4564,13 +5254,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProposedDomain"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProposedDomain"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4588,13 +5288,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProposedDomain"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProposedDomain"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4612,13 +5322,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProposedDomain"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProposedDomain"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -4636,13 +5356,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProposedDomain"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProposedDomain"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5080,13 +5810,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5104,13 +5844,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5128,13 +5878,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5152,6 +5912,9 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           },
           {
             "in": "body",
@@ -5191,13 +5954,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5215,13 +5988,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5239,13 +6022,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5263,13 +6056,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5287,13 +6090,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5311,13 +6124,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5335,13 +6158,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5359,13 +6192,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5383,13 +6226,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5407,13 +6260,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5431,13 +6294,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5455,13 +6328,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5479,13 +6362,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5503,13 +6396,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5527,13 +6430,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5551,13 +6464,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5575,13 +6498,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5599,13 +6532,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5623,13 +6566,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5647,13 +6600,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5671,13 +6634,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5695,13 +6668,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5719,13 +6702,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5743,13 +6736,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5767,13 +6770,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5791,13 +6804,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5815,13 +6838,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5839,13 +6872,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5863,13 +6906,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5887,13 +6940,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5911,13 +6974,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -5935,13 +7008,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JGroup"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JGroup"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -6139,13 +7222,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JInvitation"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JInvitation"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -6163,305 +7256,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JInvitation"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.create": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
+          },
           {
             "$ref": "#/parameters/bodyParam"
           }
         ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.list": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.modify/{id}": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JKite"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.deleteKite/{id}": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JKite"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.fetchPlans/{id}": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JKite"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.createPlan/{id}": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JKite"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JKite.deletePlan/{id}": {
-      "post": {
-        "tags": [
-          "JKite"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JKite"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JLocation.importAll": {
-      "post": {
-        "tags": [
-          "JLocation"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JLocation.importStates": {
-      "post": {
-        "tags": [
-          "JLocation"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JLocation.one": {
-      "post": {
-        "tags": [
-          "JLocation"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JLocation.fetchStatesByCountryCode": {
-      "post": {
-        "tags": [
-          "JLocation"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "Method JLocation.fetchStatesByCountryCode",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JInvitation"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -6703,436 +7514,6 @@
         }
       }
     },
-    "/remote.api/Payment.subscribe": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.subscribeGroup": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.subscriptions": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.invoices": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.fetchGroupInvoices": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.creditCard": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.fetchGroupCreditCard": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.updateCreditCard": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.updateGroupCreditCard": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.canChangePlan": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.logOrder": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.getToken": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.canUserPurchase": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.fetchGroupPlan": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/Payment.cancelGroupPlan": {
-      "post": {
-        "tags": [
-          "Payment"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
     "/remote.api/JProxyFilter.create": {
       "post": {
         "tags": [
@@ -7205,13 +7586,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProxyFilter"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProxyFilter"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -7229,13 +7620,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JProxyFilter"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JProxyFilter"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -7613,13 +8014,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JRewardCampaign"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JRewardCampaign"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -7637,13 +8048,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JRewardCampaign"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JRewardCampaign"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -7713,13 +8134,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JSession"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JSession"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9267,9 +9698,9 @@
         "description": "JComputeStack::create",
         "responses": {
           "200": {
-            "description": "Request processed succesfully",
+            "description": "created JComputeStack instance",
             "schema": {
-              "$ref": "#/definitions/DefaultResponse"
+              "$ref": "#/definitions/JComputeStack"
             }
           },
           "401": {
@@ -9353,13 +9784,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9377,13 +9818,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9401,13 +9852,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9425,13 +9886,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9449,13 +9920,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9473,13 +9954,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -9497,723 +9988,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JComputeStack"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.one": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.on": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.some": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.create": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.count": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchCount": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.byRelevance": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.cursor": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.cursorWithRelationship": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchMyFollowees": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.each": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchSkillTags": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "Method JTag.fetchSkillTags",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.byRelevanceForSkills": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchSystemTags": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.createSystemTag": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/bodyParam"
-          }
-        ],
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Request processed succesfully",
-            "schema": {
-              "$ref": "#/definitions/DefaultResponse"
-            }
-          },
-          "401": {
-            "description": "Unauthorized request",
-            "schema": {
-              "$ref": "#/definitions/UnauthorizedRequest"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.modify/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.follow/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.unfollow/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchFollowersWithRelationship/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchFollowingWithRelationship/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchContents/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchContentTeasers/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "Method JTag.fetchContentTeasers",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchSynonym/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.delete/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.fetchLastInteractors/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
-            }
-          }
-        }
-      }
-    },
-    "/remote.api/JTag.createSynonym/{id}": {
-      "post": {
-        "tags": [
-          "JTag"
-        ],
-        "consumes": [
-          "application/json"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "$ref": "#/parameters/instanceParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/JTag"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JComputeStack"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -10321,13 +10112,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JTeamInvitation"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JTeamInvitation"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }
@@ -11045,13 +10846,23 @@
         "parameters": [
           {
             "$ref": "#/parameters/instanceParam"
+          },
+          {
+            "$ref": "#/parameters/bodyParam"
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/JWorkspace"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/JWorkspace"
+                },
+                {
+                  "$ref": "#/definitions/DefaultResponse"
+                }
+              ]
             }
           }
         }

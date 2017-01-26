@@ -5,16 +5,14 @@ import (
 
 	cfg "koding/kites/config"
 	"koding/kites/config/configstore"
+	"koding/kites/kloud/stack"
 	"koding/klientctl/config"
 	"koding/klientctl/ctlcli"
 
 	"github.com/koding/kite"
 	kitecfg "github.com/koding/kite/config"
-	"github.com/koding/kite/protocol"
 	"github.com/koding/logging"
 )
-
-var kdCacheOpts = configstore.CacheOptions("kd")
 
 // Transport is an interface that abstracts underlying
 // RPC round trip.
@@ -23,25 +21,24 @@ var kdCacheOpts = configstore.CacheOptions("kd")
 // a kiteTransport, but plain net/rpc can also be
 // used.
 type Transport interface {
+	Connect(url string) (Transport, error)
 	Call(method string, arg, reply interface{}) error
-	Valid() error
 }
+
+// DefaultLog is a logger used by Client with nil Log.
+var DefaultLog logging.Logger = logging.NewCustom("endpoint-kloud", false)
 
 // DefaultClient is a default client used by Cache, Kite,
 // KiteConfig and Kloud functions.
 var DefaultClient = &Client{
-	Transport: &KiteTransport{
-		DialTimeout: 30 * time.Second,
-		TellTimeout: 60 * time.Second,
-	},
+	Transport: &KiteTransport{},
 }
 
 // Client is responsible for communication with Kloud kite.
 type Client struct {
-	// Log is used for logging.
-	Log logging.Logger
-
 	// Transport is used for RPC communication.
+	//
+	// Required.
 	Transport Transport
 
 	cache *cfg.Cache
@@ -52,7 +49,7 @@ func (c *Client) Cache() *cfg.Cache {
 		return c.cache
 	}
 
-	c.cache = cfg.NewCache(kdCacheOpts)
+	c.cache = cfg.NewCache(configstore.CacheOptions("kd"))
 	ctlcli.CloseOnExit(c.cache)
 
 	return c.cache
@@ -71,24 +68,41 @@ func (c *Client) Call(method string, arg, reply interface{}) error {
 
 // KiteTransport is a default transport that uses github.com/koding/kite
 // for underlying communication.
+//
+// Zero value of KiteTransport tries to connect to Kloud and Kontrol
+// endpoints defined in config.Konfig (read from konfig.bolt).
 type KiteTransport struct {
+	// Konfig is a Koding configuration to use when calling endpoints.
+	//
+	// If nil, global config.Konfig is going to be used instead.
+	Konfig *cfg.Konfig
+
 	// DialTimeout is a maximum time external kite is
 	// going to be dialed for.
+	//
+	// If zero, 30s is going to be used instead.
 	DialTimeout time.Duration
 
 	// TellTimeout is a maximum time of kite's
 	// request/response roundtrip.
+	//
+	// If zero, 60s is going to be used instead.
 	TellTimeout time.Duration
 
 	// Log is used for logging.
+	//
+	// If nil, DefaultLog is going to be used instead.
 	Log logging.Logger
 
-	k      *kite.Kite
-	kCfg   *kitecfg.Config
-	kKloud *kite.Client
+	k       *kite.Kite
+	kCfg    *kitecfg.Config
+	kClient *kite.Client
 }
 
-var _ Transport = (*KiteTransport)(nil)
+var (
+	_ Transport       = (*KiteTransport)(nil)
+	_ stack.Validator = (*KiteTransport)(nil)
+)
 
 func (kt *KiteTransport) Call(method string, arg, reply interface{}) error {
 	k, err := kt.kloud()
@@ -96,7 +110,7 @@ func (kt *KiteTransport) Call(method string, arg, reply interface{}) error {
 		return err
 	}
 
-	r, err := k.TellWithTimeout(method, kt.TellTimeout, arg)
+	r, err := k.TellWithTimeout(method, kt.tellTimeout(), arg)
 	if err != nil {
 		return err
 	}
@@ -108,6 +122,27 @@ func (kt *KiteTransport) Call(method string, arg, reply interface{}) error {
 	return nil
 }
 
+func (kt *KiteTransport) Connect(url string) (Transport, error) {
+	k, err := kt.newClient(url)
+	if err != nil {
+		return nil, err
+	}
+
+	ktCopy := *kt
+	ktCopy.kClient = k
+
+	return &ktCopy, nil
+}
+
+func (kt *KiteTransport) SetKiteKey(kiteKey string) {
+	if kt.kClient != nil {
+		kt.kClient.Auth = &kite.Auth{
+			Type: "kiteKey",
+			Key:  kiteKey,
+		}
+	}
+}
+
 func (kt *KiteTransport) kite() *kite.Kite {
 	if kt.k != nil {
 		return kt.k
@@ -115,7 +150,7 @@ func (kt *KiteTransport) kite() *kite.Kite {
 
 	kt.k = kite.New(config.Name, config.KiteVersion)
 	kt.k.Config = kt.kiteConfig()
-	kt.k.Log = kt.Log
+	kt.k.Log = kt.log()
 
 	return kt.k
 }
@@ -125,8 +160,8 @@ func (kt *KiteTransport) kiteConfig() *kitecfg.Config {
 		return kt.kCfg
 	}
 
-	kt.kCfg = config.Konfig.KiteConfig()
-	kt.kCfg.KontrolURL = config.Konfig.Endpoints.Kontrol().Public.String()
+	kt.kCfg = kt.konfig().KiteConfig()
+	kt.kCfg.KontrolURL = kt.konfig().Endpoints.Kontrol().Public.String()
 	kt.kCfg.Environment = config.Environment
 	kt.kCfg.Transport = kitecfg.XHRPolling
 
@@ -134,37 +169,63 @@ func (kt *KiteTransport) kiteConfig() *kitecfg.Config {
 }
 
 func (kt *KiteTransport) kloud() (*kite.Client, error) {
-	if kt.kKloud != nil {
-		return kt.kKloud, nil
+	if kt.kClient != nil {
+		return kt.kClient, nil
 	}
 
-	kloud := kt.kite().NewClient(config.Konfig.Endpoints.Kloud().Public.String())
+	kloud, err := kt.newClient(kt.konfig().Endpoints.Kloud().Public.String())
+	if err != nil {
+		return nil, err
+	}
 
-	if err := kloud.DialTimeout(kt.DialTimeout); err != nil {
-		query := &protocol.KontrolQuery{
-			Name:        "kloud",
-			Environment: kt.kiteConfig().Environment,
-		}
+	kt.kClient = kloud
 
-		clients, err := kt.kite().GetKites(query)
-		if err != nil {
-			return nil, err
-		}
+	return kt.kClient, nil
+}
 
-		kloud = kt.kite().NewClient(clients[0].URL)
+func (kt *KiteTransport) newClient(url string) (*kite.Client, error) {
+	k := kt.kite().NewClient(url)
 
-		if err := kloud.DialTimeout(kt.DialTimeout); err != nil {
-			return nil, err
+	if err := k.DialTimeout(kt.dialTimeout()); err != nil {
+		return nil, err
+	}
+
+	if kitekey := kt.kiteConfig().KiteKey; kitekey != "" {
+		k.Auth = &kite.Auth{
+			Type: "kiteKey",
+			Key:  kitekey,
 		}
 	}
 
-	kt.kKloud = kloud
-	kt.kKloud.Auth = &kite.Auth{
-		Type: "kiteKey",
-		Key:  kt.kiteConfig().KiteKey,
-	}
+	return k, nil
+}
 
-	return kt.kKloud, nil
+func (kt *KiteTransport) dialTimeout() time.Duration {
+	if kt.DialTimeout != 0 {
+		return kt.DialTimeout
+	}
+	return 30 * time.Second
+}
+
+func (kt *KiteTransport) tellTimeout() time.Duration {
+	if kt.TellTimeout != 0 {
+		return kt.TellTimeout
+	}
+	return 60 * time.Second
+}
+
+func (kt *KiteTransport) log() logging.Logger {
+	if kt.Log != nil {
+		return kt.Log
+	}
+	return DefaultLog
+}
+
+func (kt *KiteTransport) konfig() *cfg.Konfig {
+	if kt.Konfig != nil {
+		return kt.Konfig
+	}
+	return config.Konfig
 }
 
 func (kt *KiteTransport) Valid() error {

@@ -14,7 +14,6 @@ express               = require 'express'
 helmet                = require 'helmet'
 bodyParser            = require 'body-parser'
 metrics               = require '../../datadog'
-usertracker           = require '../../../workers/usertracker'
 app                   = express()
 webPort               = argv.p ? webserver.port
 { error_500 }         = require './helpers'
@@ -24,28 +23,14 @@ setCrsfToken          = require './setcsrftoken'
 
 do ->
   cookieParser = require 'cookie-parser'
-  session      = require 'express-session'
-  compression  = require 'compression'
-
   app.set 'case sensitive routing', on
 
-  headers = {}
-  if webserver?.useCacheHeader
-    headers.maxAge = 1000 * 60 * 60 * 24 # 1 day
-
-  app.use express.static "#{projectRoot}/website/", headers
-  app.use cookieParser()
-  app.use session
-    secret            : 'foo'
-    resave            : yes
-    saveUninitialized : true
+  app.use cookieParser() # used by req.cookies.blah
   app.use bodyParser.urlencoded { extended : yes }
-  app.use compression()
   # helmet:
-  app.use helmet.xframe('sameorigin')
-  app.use helmet.iexss()
-  app.use helmet.ienoopen()
-  app.use helmet.contentTypeOptions()
+  app.use helmet.frameguard { action: 'sameorigin' }
+  app.use helmet.xssFilter()
+  app.use helmet.ieNoOpen()
   app.use helmet.hidePoweredBy()
   app.use metrics.send
 
@@ -71,29 +56,27 @@ app.post '/-/teams/invite-by-csv'                , require('./handlers/invitetot
 app.post '/-/teams/invite-by-csv-analyze'        , require('./handlers/invitetoteambycsvAnalyze').handler
 app.get  '/-/teams/check-team-invitation'        , require './handlers/teaminvitationchecker'
 
-# fetches last members of team
+# used in landing pages where we handle login/register
 app.all  '/-/team/:name/members'                 , require './handlers/getteammembers'
 app.all  '/-/team/:name'                         , require './handlers/getteam'
 app.all  '/-/profile/:email'                     , require './handlers/getprofile'
 app.all  '/-/unsubscribe/:token/:email'          , require './handlers/unsubscribe'
-# temp endpoints ends
 
+# used from client side in site.landing/coffee/core/analytics.coffee
 app.post '/-/analytics/track'                    , require './handlers/analytics/track'
 app.post '/-/analytics/page'                     , require './handlers/analytics/page'
 
-app.get  '/-/my/permissionsAndRoles'             , require './handlers/myPermissionsAndRoles'
+# used in collaboration
 app.get  '/-/google-api/authorize/drive'         , require './handlers/authorizedrive'
 app.post '/-/support/new', bodyParser.json()     , require './handlers/supportnew'
 app.post '/-/wufoo/submit/:identifier?'          , require './handlers/wufooproxy'
-# should deprecate those /Validates, they don't look like api endpoints
-app.post '/:name?/Validate/Username/:username?'  , require './handlers/validateusername'
-app.post '/:name?/Validate/Email/:email?'        , require './handlers/validateemail'
-app.post '/:name?/Validate'                      , require './handlers/validate'
+
+# used in landing
 app.post '/-/password-strength'                  , require './handlers/passwordstrength'
 app.post '/-/validate/username'                  , require './handlers/validateusername'
 app.post '/-/validate/email'                     , require './handlers/validateemail'
 app.post '/-/validate'                           , require './handlers/validate'
-app.get  '/Verify/:token'                        , require './handlers/verifytoken'
+
 app.post '/:name?/Register'                      , csrf,   require './handlers/register'
 app.post '/:name?/Login'                         , csrf,   require './handlers/login'
 app.post '/Impersonate/:nickname'                , csrf,   require './handlers/impersonate'
@@ -110,7 +93,6 @@ app.get  '/-/version'                            , (req, res) -> res.jsonp { ver
 app.get  '/-/jobs'                               , require './handlers/jobs'
 app.post '/recaptcha'                            , require './handlers/recaptcha'
 app.get  '/-/presence/:service'                  , (req, res) -> res.status(200).end()
-app.get  '/-/api/user/:username/flags/:flag'     , require './handlers/flaguser'
 app.post '/-/api/user/create'                    , require './handlers/api/createuser'
 app.post '/-/api/ssotoken/create'                , require './handlers/api/createssotoken'
 app.get  '/-/api/ssotoken/login'                 , require './handlers/api/ssotokenlogin'
@@ -135,8 +117,7 @@ app.post '/Gravatar'                             , require './handlers/gravatar'
 app.post '/-/gravatar'                           , require './handlers/gravatar'
 app.get  '/-/confirm'                            , require './handlers/confirm'
 app.get  '/-/loginwithtoken'                     , require './handlers/loginwithtoken'
-app.get  '/:name?/Develop/?*'                    , (req, res) -> res.redirect 301, '/'
-app.all  '/:name/:section?/:slug?'               , require './handlers/main.coffee'
+app.get  '/:name/:section?/:slug?'               , require './handlers/main.coffee'
 app.get  '*'                                     , require './handlers/root.coffee'
 
 # once bongo is ready we can start listening
@@ -145,9 +126,6 @@ koding.once 'dbClientReady', ->
   # start webserver
   app.listen webPort
   console.log '[WEBSERVER] running', "http://localhost:#{webPort} pid:#{process.pid}"
-
-  # start user tracking
-  usertracker.start koding.redisClient
 
   if KONFIG.environment is 'production'
     { NodejsProfiler } = require 'koding-datadog'

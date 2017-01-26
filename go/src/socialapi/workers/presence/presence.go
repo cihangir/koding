@@ -24,6 +24,16 @@ func init() {
 }
 
 const (
+	// EndpointPresencePing provides ping endpoint
+	EndpointPresencePing = "/presence/ping"
+
+	EndpointPresenceListMembers = "/presence/listmembers"
+
+	// EndpointPresencePingPrivate provides private ping endpoint
+	EndpointPresencePingPrivate = "/private/presence/ping"
+)
+
+const (
 	// EventName holds presence event name
 	EventName = "presence_ping"
 )
@@ -152,7 +162,7 @@ func getPresenceInfoFromDB(ping *Ping) (*models.PresenceDaily, error) {
 			// Second issue is, when a sub is in non-active state, we should still
 			// collect presence info but we wont be charging users during that period,
 			// because we dont allow them to utilize koding
-			"is_processed": ping.paymentStatus != mongomodels.PaymentStatusActive,
+			"is_processed": ping.paymentStatus != string(mongomodels.SubStatusActive),
 		},
 		Sort: map[string]string{
 			"created_at": "DESC",
@@ -171,7 +181,7 @@ func insertPresenceInfoToDB(ping *Ping) error {
 		GroupName:   ping.GroupName,
 		AccountId:   ping.AccountID,
 		CreatedAt:   ping.CreatedAt,
-		IsProcessed: ping.paymentStatus != mongomodels.PaymentStatusActive,
+		IsProcessed: ping.paymentStatus != string(mongomodels.SubStatusActive),
 	}
 	return p.Create()
 }
@@ -196,12 +206,12 @@ func getGroupPaymentStatusFromCache(groupName string) (string, error) {
 
 	status := group.Payment.Subscription.Status
 	// set defaul payment status
-	if status != mongomodels.PaymentStatusActive {
+	if status != mongomodels.SubStatusActive {
 		status = "invalid"
 	}
 
 	if err := groupCache.Set(groupName, status); err != nil {
 		return "", err
 	}
-	return status, nil
+	return string(status), nil
 }

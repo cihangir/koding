@@ -2,7 +2,6 @@ package team
 
 import (
 	"fmt"
-	"strconv"
 
 	"koding/db/models"
 	"koding/db/mongodb/modelhelper"
@@ -41,9 +40,8 @@ func (m *MongoDatabase) Teams(f *Filter) ([]*Team, error) {
 
 	if f.Slug != "" {
 		return m.fetchOne(f.Username, f.Slug)
-	} else {
-		return m.fetchAll(f.Username)
 	}
+	return m.fetchAll(f.Username)
 }
 
 // fetchOne returns only specified team.
@@ -87,13 +85,11 @@ func groups2teams(groups ...*models.Group) []*Team {
 			continue
 		}
 
-		members, _ := group.Counts["members"].(int)
 		teams = append(teams, &Team{
-			Name:         group.Title,
-			Slug:         group.Slug,
-			Members:      strconv.Itoa(members),
-			Privacy:      group.Privacy,
-			Subscription: group.Payment.Subscription.Status,
+			Name:      group.Title,
+			Slug:      group.Slug,
+			Privacy:   group.Privacy,
+			SubStatus: group.Payment.Subscription.Status,
 		})
 	}
 

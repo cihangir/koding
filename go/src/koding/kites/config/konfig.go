@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
@@ -58,6 +59,9 @@ func (e *Endpoints) Social() *Endpoint {
 type Konfig struct {
 	Endpoints *Endpoints `json:"endpoints,omitempty"`
 
+	KontrolURL string `json:"kontrolURL,omitempty"` // deprecated / read-only
+	TunnelURL  string `json:"tunnelURL,omitempty"`  // deprecated / read-only
+
 	// Kite configuration.
 	Environment string `json:"environment,omitempty"`
 	KiteKeyFile string `json:"kiteKeyFile,omitempty"`
@@ -73,7 +77,7 @@ type Konfig struct {
 	PublicBucketName   string `json:"publicBucketName,omitempty"`
 	PublicBucketRegion string `json:"publicBucketRegion,omitempty"`
 
-	Debug bool `json:"debug,omitempty"`
+	Debug bool `json:"debug,string,omitempty"`
 
 	// Metadata keeps per-app configuration.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
@@ -94,6 +98,11 @@ func (k *Konfig) KlientGzURL() string {
 }
 
 func (k *Konfig) Valid() error {
+	// TODO(rjeczalik): remove when KontrolURL is gone
+	if _, err := url.Parse(k.KontrolURL); err == nil && k.KontrolURL != "" {
+		return nil
+	}
+
 	if k.Endpoints == nil {
 		return errors.New("endpoints are nil")
 	}
@@ -107,8 +116,42 @@ func (k *Konfig) Valid() error {
 }
 
 func (k *Konfig) ID() string {
-	hash := sha1.Sum([]byte(k.Endpoints.Koding.Public.String()))
+	return ID(k.KodingPublic().String())
+}
+
+func ID(kodingURL string) string {
+	if kodingURL == "" {
+		return ""
+	}
+	if u, err := url.Parse(kodingURL); err == nil {
+		// Since id is input sensitive we clean the path so "example.com/koding"
+		// "example.com/koding/" are effecitvely the same urls.
+		u.Path = strings.TrimRight(path.Clean(u.Path), "/")
+		kodingURL = u.String()
+	}
+	hash := sha1.Sum([]byte(kodingURL))
 	return hex.EncodeToString(hash[:4])
+}
+
+// KodingPublic is here for backward-compatibility purposes.
+//
+// Old klient and kd deployments may not have .Endpoints configuration
+// on a first run, this is why we fallback to old KontrolURL field.
+//
+// Which we should eventually get rid of.
+//
+// Deprecated: Use k.Endpoints.Koding.Public instead.
+func (k *Konfig) KodingPublic() *url.URL {
+	if e := k.Endpoints; e != nil && e.Koding != nil && e.Koding.Public != nil {
+		return e.Koding.Public.URL
+	}
+
+	if u, err := url.Parse(k.KontrolURL); err == nil {
+		u.Path = ""
+		return u
+	}
+
+	return nil
 }
 
 func (k *Konfig) buildKiteConfig() *konfig.Config {
@@ -134,6 +177,14 @@ func (k *Konfig) buildKiteConfig() *konfig.Config {
 	}
 
 	return konfig.New()
+}
+
+func NewKonfigURL(koding *url.URL) *Konfig {
+	return &Konfig{
+		Endpoints: &Endpoints{
+			Koding: NewEndpointURL(koding),
+		},
+	}
 }
 
 type Konfigs map[string]*Konfig
@@ -184,12 +235,11 @@ func (e *Environments) kdEnv() string {
 func NewKonfig(e *Environments) *Konfig {
 	return &Konfig{
 		Environment: e.Env,
-		KiteKeyFile: "/etc/kite/kite.key",
 		Endpoints: &Endpoints{
-			Koding:       Builtin.Endpoints.KodingBase,
-			Tunnel:       Builtin.Endpoints.TunnelServer,
-			IP:           Builtin.Endpoints.IP,
-			IPCheck:      Builtin.Endpoints.IPCheck,
+			Koding:       Builtin.Endpoints.KodingBase.Copy(),
+			Tunnel:       Builtin.Endpoints.TunnelServer.Copy(),
+			IP:           Builtin.Endpoints.IP.Copy(),
+			IPCheck:      Builtin.Endpoints.IPCheck.Copy(),
 			KlientLatest: ReplaceEnv(Builtin.Endpoints.KlientLatest, e.klientEnv()),
 			KDLatest:     ReplaceEnv(Builtin.Endpoints.KDLatest, RmManaged(e.kdEnv())),
 			Klient: &Endpoint{

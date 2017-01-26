@@ -4,20 +4,26 @@ Bongo      = require 'bongo'
 KONFIG = require 'koding-config-manager'
 { projectRoot, webserver, mongoReplSet } = KONFIG
 
+mongo = "mongodb://#{KONFIG.mongo}"
+
+options =
+  max   : 1000 # max 1K item
+  maxAge: 1000 * 60 * 60 # 1 hour
+
+cache = require('lru-cache')(options)
+
 redisClient = require('redis').createClient(
-  KONFIG.monitoringRedis.port
-  KONFIG.monitoringRedis.host
+  KONFIG.redis.port
+  KONFIG.redis.host
   {}
 )
 
-mongo = "mongodb://#{KONFIG.mongo}"
-
 module.exports = koding = new Bongo
-
+  cache       : cache
+  redisClient : redisClient
   mongo       : mongoReplSet or mongo
   root        : projectRoot
   models      : 'workers/social/lib/social/models'
-  redisClient : redisClient
   fetchClient : (sessionToken, context, callback) ->
 
     { JUser, JAccount } = koding.models

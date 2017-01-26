@@ -15,6 +15,9 @@ import (
 // swagger:model JComputeStack
 type JComputeStack struct {
 
+	// id
+	ID string `json:"_id,omitempty"`
+
 	// base stack Id
 	BaseStackID string `json:"baseStackId,omitempty"`
 
@@ -106,6 +109,9 @@ func (m *JComputeStack) validateStatus(formats strfmt.Registry) error {
 	if m.Status != nil {
 
 		if err := m.Status.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("status")
+			}
 			return err
 		}
 	}

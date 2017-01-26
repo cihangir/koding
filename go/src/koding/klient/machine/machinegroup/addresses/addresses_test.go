@@ -71,7 +71,10 @@ func TestAddressesMachineID(t *testing.T) {
 	}
 
 	for name, test := range tests {
+		// capture range variable here
+		test := test
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			id, err := addrs.MachineID(test.Addr)
 			if (err == nil) != test.Valid {
 				t.Fatalf("want err == nil => %t; got err %v", test.Valid, err)
@@ -81,5 +84,56 @@ func TestAddressesMachineID(t *testing.T) {
 				t.Fatalf("want machine ID = %s; got %s", test.ID, id)
 			}
 		})
+	}
+}
+
+func TestAddressesMachineIDDuplicated(t *testing.T) {
+	makeAddr := func(updatedAt time.Time) machine.Addr {
+		return machine.Addr{
+			Network:   "ip",
+			Value:     "52.254.159.36",
+			UpdatedAt: updatedAt,
+		}
+	}
+
+	machines := []struct {
+		ID   machine.ID
+		Addr machine.Addr
+	}{
+		{
+			ID:   "ID_1",
+			Addr: makeAddr(time.Date(2010, time.May, 1, 0, 0, 0, 0, time.UTC)),
+		},
+		{
+			ID:   "ID_2",
+			Addr: makeAddr(time.Date(2012, time.May, 1, 0, 0, 0, 0, time.UTC)),
+		},
+		{
+			ID:   "ID_3",
+			Addr: makeAddr(time.Date(2011, time.May, 1, 0, 0, 0, 0, time.UTC)),
+		},
+	}
+
+	addrs := addresses.New()
+	machineIDs := make(map[machine.ID]struct{})
+
+	for i, machine := range machines {
+		machineIDs[machine.ID] = struct{}{}
+		if err := addrs.Add(machine.ID, machine.Addr); err != nil {
+			t.Fatalf("want err = nil; got %v (i:%v)", err, i)
+		}
+	}
+
+	if len(machineIDs) != len(addrs.Registered()) {
+		t.Fatal("want %d machines; got %d", len(machineIDs), len(addrs.Registered()))
+	}
+
+	id, err := addrs.MachineID(makeAddr(time.Time{}))
+	if err != nil {
+		t.Errorf("want err = nil; got %v", err)
+	}
+
+	if wantID := machine.ID("ID_2"); wantID != id {
+		t.Errorf("want machine ID = %v; got %v", wantID, id)
 	}
 }

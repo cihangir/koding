@@ -15,6 +15,9 @@ import (
 // swagger:model JProxyFilter
 type JProxyFilter struct {
 
+	// id
+	ID string `json:"_id,omitempty"`
+
 	// created at
 	CreatedAt strfmt.Date `json:"createdAt,omitempty"`
 
@@ -65,6 +68,10 @@ func (m *JProxyFilter) validateRules(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Rules) { // not required
 		return nil
+	}
+
+	for i := 0; i < len(m.Rules); i++ {
+
 	}
 
 	return nil

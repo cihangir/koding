@@ -1,3 +1,4 @@
+uuid          = require 'uuid'
 async         = require 'async'
 jraphical     = require 'jraphical'
 emailsanitize = require './user/emailsanitize'
@@ -6,7 +7,6 @@ KodingError   = require '../error'
 module.exports = class JPasswordRecovery extends jraphical.Module
   # TODO - Refactor this file, now it is not only for password recovery
   # but also for email verification
-  { v4 : createId }            = require 'node-uuid'
   { secure, signature }        = require 'bongo'
 
   JUser                        = require './user'
@@ -103,13 +103,13 @@ module.exports = class JPasswordRecovery extends jraphical.Module
         return callback null # pretend like everything went fine.
 
       options.resetPassword = yes
-      options.verb = if group and group isnt 'koding' then 'Team/Reset' else 'Reset'
+      options.verb = 'Team/Reset'
       options.queryParams = { mode }  if mode
       @create options, callback
 
   @create = (options, callback) ->
     JUser = require './user'
-    token = createId()
+    token = uuid.v4()
 
     { email, sanitizedEmail, verb }      = options
     { expiryPeriod, group, queryParams } = options

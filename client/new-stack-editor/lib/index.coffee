@@ -1,10 +1,21 @@
 kd = require 'kd'
-{ markAsLoaded, log } = require './helpers'
 AppController = require 'app/appcontroller'
 showErrorNotification = require 'app/util/showErrorNotification'
+
+EnvironmentFlux = require 'app/flux/environment'
+
+Events = require './events'
 StackEditor = require './views'
+StackWizardModal = require './views/wizard/stackwizardmodal'
+
+
+{ markAsLoaded, log } = require './helpers'
 
 do require './routehandler'
+
+require 'new-stack-editor/styl'
+# It will be moved to kd.js once it's ready ~ GG
+require 'new-stack-editor/views/flexsplit/styl'
 
 Errors      =
   NotExists :
@@ -21,46 +32,47 @@ Errors      =
 #
 module.exports = class StackEditorAppController extends AppController
 
-  @options     =
+  @options     = {
     name       : 'Stackeditor'
     customName : 'new-stack-editor'
     behavior   : 'application'
+  }
 
   constructor: (options = {}, data) ->
-
-    console.trace()
-    log '::init', options, data
 
     super options, data
 
     @templates = {}
-    @mainView.addSubView @editor = new StackEditor
+    @mainView.addSubView @stackEditor = new StackEditor
+
+    @stackEditor.on Events.InitializeRequested, @bound 'initializeStack'
 
 
-  openEditor: (stackTemplateId) ->
+  openEditor: (templateId, reset = no) ->
 
-    console.trace()
-    log '::openEditor', stackTemplateId
+    unless templateId
+      do @openStackWizard
+      return
 
-    @fetchStackTemplate stackTemplateId, (err, template) =>
+    @fetchStackTemplate templateId, (err, template) =>
       return showErrorNotification err  if err
-      @editor.setData template
+      @stackEditor.setTemplateData template, reset
 
-    markAsLoaded stackTemplateId
+    markAsLoaded templateId
 
 
   openStackWizard: (handleRoute = yes) ->
 
-    console.trace()
-    log '::openStackWizard', handleRoute
-
-    markAsLoaded null
+    new StackWizardModal { handleRoute }
+    markAsLoaded()
 
 
-  reloadEditor: (templateId, skipDataUpdate) ->
+  reloadEditor: (templateId) ->
 
-    console.trace()
-    log '::reloadEditor', templateId, skipDataUpdate
+    return  unless @templates[templateId]
+
+    delete @templates[templateId]
+    @openEditor templateId, reset = yes
 
 
   fetchStackTemplate: (templateId, callback) ->
@@ -74,3 +86,23 @@ module.exports = class StackEditorAppController extends AppController
       return callback Errors.NotExists  unless template
 
       callback null, @templates[templateId] = template
+
+
+  initializeStack: (template) ->
+
+    console.trace()
+    log '::initializeStack', template
+
+    if @stackEditor.sideView.hasClass 'hidden'
+    then @stackEditor.sideView.show 'credentials'
+    else @stackEditor.sideView.hide()
+
+
+  createStackTemplate: (provider) ->
+
+    unless provider
+      return console.warn 'Provider is required!'
+
+    EnvironmentFlux.actions.createStackTemplateWithDefaults provider
+      .then ({ stackTemplate }) ->
+        kd.singletons.router.handleRoute "/Stack-Editor/#{stackTemplate._id}"

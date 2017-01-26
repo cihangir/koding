@@ -23,8 +23,6 @@ import (
 	"koding/remoteapi/client/j_domain_alias"
 	"koding/remoteapi/client/j_group"
 	"koding/remoteapi/client/j_invitation"
-	"koding/remoteapi/client/j_kite"
-	"koding/remoteapi/client/j_location"
 	"koding/remoteapi/client/j_machine"
 	"koding/remoteapi/client/j_name"
 	"koding/remoteapi/client/j_password_recovery"
@@ -37,13 +35,11 @@ import (
 	"koding/remoteapi/client/j_session"
 	"koding/remoteapi/client/j_snapshot"
 	"koding/remoteapi/client/j_stack_template"
-	"koding/remoteapi/client/j_tag"
 	"koding/remoteapi/client/j_team_invitation"
 	"koding/remoteapi/client/j_url_alias"
 	"koding/remoteapi/client/j_user"
 	"koding/remoteapi/client/j_workspace"
 	"koding/remoteapi/client/o_auth"
-	"koding/remoteapi/client/payment"
 	"koding/remoteapi/client/s3"
 	"koding/remoteapi/client/shared_machine"
 	"koding/remoteapi/client/sidebar"
@@ -99,10 +95,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Koding {
 
 	cli.JInvitation = j_invitation.New(transport, formats)
 
-	cli.JKite = j_kite.New(transport, formats)
-
-	cli.JLocation = j_location.New(transport, formats)
-
 	cli.JMachine = j_machine.New(transport, formats)
 
 	cli.JName = j_name.New(transport, formats)
@@ -127,8 +119,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Koding {
 
 	cli.JStackTemplate = j_stack_template.New(transport, formats)
 
-	cli.JTag = j_tag.New(transport, formats)
-
 	cli.JTeamInvitation = j_team_invitation.New(transport, formats)
 
 	cli.JURLAlias = j_url_alias.New(transport, formats)
@@ -138,8 +128,6 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *Koding {
 	cli.JWorkspace = j_workspace.New(transport, formats)
 
 	cli.OAuth = o_auth.New(transport, formats)
-
-	cli.Payment = payment.New(transport, formats)
 
 	cli.S3 = s3.New(transport, formats)
 
@@ -190,10 +178,6 @@ type Koding struct {
 
 	JInvitation *j_invitation.Client
 
-	JKite *j_kite.Client
-
-	JLocation *j_location.Client
-
 	JMachine *j_machine.Client
 
 	JName *j_name.Client
@@ -218,8 +202,6 @@ type Koding struct {
 
 	JStackTemplate *j_stack_template.Client
 
-	JTag *j_tag.Client
-
 	JTeamInvitation *j_team_invitation.Client
 
 	JURLAlias *j_url_alias.Client
@@ -229,8 +211,6 @@ type Koding struct {
 	JWorkspace *j_workspace.Client
 
 	OAuth *o_auth.Client
-
-	Payment *payment.Client
 
 	S3 *s3.Client
 
@@ -283,10 +263,6 @@ func (c *Koding) SetTransport(transport runtime.ClientTransport) {
 
 	c.JInvitation.SetTransport(transport)
 
-	c.JKite.SetTransport(transport)
-
-	c.JLocation.SetTransport(transport)
-
 	c.JMachine.SetTransport(transport)
 
 	c.JName.SetTransport(transport)
@@ -311,8 +287,6 @@ func (c *Koding) SetTransport(transport runtime.ClientTransport) {
 
 	c.JStackTemplate.SetTransport(transport)
 
-	c.JTag.SetTransport(transport)
-
 	c.JTeamInvitation.SetTransport(transport)
 
 	c.JURLAlias.SetTransport(transport)
@@ -322,8 +296,6 @@ func (c *Koding) SetTransport(transport runtime.ClientTransport) {
 	c.JWorkspace.SetTransport(transport)
 
 	c.OAuth.SetTransport(transport)
-
-	c.Payment.SetTransport(transport)
 
 	c.S3.SetTransport(transport)
 

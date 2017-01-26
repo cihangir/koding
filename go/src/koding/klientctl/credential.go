@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"koding/kites/config"
 	"koding/kites/kloud/stack"
 	"koding/klientctl/endpoint/credential"
+	"koding/klientctl/endpoint/team"
 	"koding/klientctl/helper"
 
 	"github.com/codegangsta/cli"
@@ -30,8 +32,7 @@ func CredentialList(c *cli.Context, log logging.Logger, _ string) (int, error) {
 	}
 
 	if len(creds) == 0 {
-		fmt.Fprintln(os.Stderr, "You have no matching credentials attached to your Koding account.")
-		return 0, nil
+		return 0, fmt.Errorf("you have no matching credentials attached to your Koding account")
 	}
 
 	if c.Bool("json") {
@@ -148,9 +149,13 @@ func AskCredentialCreate(c *cli.Context) (*credential.CreateOptions, error) {
 
 	// TODO(rjeczalik): remove when support for generic team is implemented
 	if opts.Team == "" {
-		opts.Team, err = helper.Ask("Team name []: ")
+		opts.Team, err = helper.Ask("Team name [%s]: ", team.Used().Name)
 		if err != nil {
 			return nil, err
+		}
+
+		if opts.Team == "" {
+			opts.Team = team.Used().Name
 		}
 	}
 
@@ -173,8 +178,7 @@ func CredentialCreate(c *cli.Context, log logging.Logger, _ string) (int, error)
 	case "":
 		opts, err = AskCredentialCreate(c)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error building credential data:", err)
-			return 1, err
+			return 1, fmt.Errorf("error building credential data: %v", err)
 		}
 	case "-":
 		p, err = ioutil.ReadAll(os.Stdin)
@@ -183,8 +187,7 @@ func CredentialCreate(c *cli.Context, log logging.Logger, _ string) (int, error)
 	}
 
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error reading credential file:", err)
-		return 1, err
+		return 1, fmt.Errorf("error reading credential file: %v", err)
 	}
 
 	fmt.Fprintln(os.Stderr, "Creating credential... ")
@@ -200,8 +203,7 @@ func CredentialCreate(c *cli.Context, log logging.Logger, _ string) (int, error)
 
 	cred, err := credential.Create(opts)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error creating credential:", err)
-		return 1, err
+		return 1, fmt.Errorf("error creating credential: %v", err)
 	}
 
 	if c.Bool("json") {
@@ -223,15 +225,13 @@ func CredentialCreate(c *cli.Context, log logging.Logger, _ string) (int, error)
 func CredentialDescribe(c *cli.Context, log logging.Logger, _ string) (int, error) {
 	descs, err := credential.Describe()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error requesting credential description:", err)
-		return 1, err
+		return 1, fmt.Errorf("error requesting credential description: %v", err)
 	}
 
 	if p := c.String("provider"); p != "" {
 		desc, ok := descs[p]
 		if !ok {
-			fmt.Fprintf(os.Stderr, "No description found for %q provider.\n", p)
-			return 1, err
+			return 1, fmt.Errorf("no description found for %q provider", p)
 		}
 
 		descs = stack.Descriptions{p: desc}
@@ -253,14 +253,37 @@ func CredentialDescribe(c *cli.Context, log logging.Logger, _ string) (int, erro
 	return 0, nil
 }
 
+func CredentialUse(c *cli.Context, _ logging.Logger, _ string) (int, error) {
+	if c.NArg() != 1 {
+		cli.ShowCommandHelp(c, "use")
+		return 1, errors.New("missing argument")
+	}
+
+	arg := c.Args().Get(0)
+
+	if err := credential.Use(arg); err != nil {
+		return 1, errors.New("error changing default credential: " + err.Error())
+	}
+
+	return 0, nil
+}
+
 func printCreds(creds []stack.CredentialItem) {
 	w := tabwriter.NewWriter(os.Stdout, 2, 0, 2, ' ', 0)
 	defer w.Flush()
 
-	fmt.Fprintln(w, "ID\tTITLE\tTEAM\tPROVIDER")
+	used := credential.Used()
+
+	fmt.Fprintln(w, "ID\tTITLE\tTEAM\tPROVIDER\tUSED")
 
 	for _, cred := range creds {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", cred.Identifier, cred.Title, cred.Team, cred.Provider)
+		isused := "-"
+
+		if ident, ok := used[cred.Provider]; ok && cred.Identifier == ident {
+			isused = "default"
+		}
+
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", cred.Identifier, cred.Title, cred.Team, cred.Provider, isused)
 	}
 }
 

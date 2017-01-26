@@ -2,7 +2,6 @@
 { updateCookie }    = require './client'
 koding              = require './bongo'
 KONFIG              = require 'koding-config-manager'
-usertracker         = require './../../../workers/usertracker'
 
 module.exports = (req, res, next) ->
 
@@ -34,11 +33,6 @@ module.exports = (req, res, next) ->
 
     remoteIp = req.headers['x-forwarded-for'] or req.connection.remoteAddress
     return next()  unless remoteIp
-
-    res.cookie 'clientIPAddress', remoteIp, { maxAge: 900000, httpOnly: no }
-
-    if result?.session?.username
-      usertracker.track result.session.username
 
     JSession.updateClientIP result.session.clientId, remoteIp, (err) ->
       console.log err  if err?

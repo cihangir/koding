@@ -14,6 +14,9 @@ import (
 // swagger:model JUser
 type JUser struct {
 
+	// id
+	ID string `json:"_id,omitempty"`
+
 	// blocked reason
 	BlockedReason string `json:"blockedReason,omitempty"`
 
@@ -25,9 +28,6 @@ type JUser struct {
 
 	// email frequency
 	EmailFrequency interface{} `json:"emailFrequency,omitempty"`
-
-	// inactive
-	Inactive interface{} `json:"inactive,omitempty"`
 
 	// last login date
 	LastLoginDate strfmt.Date `json:"lastLoginDate,omitempty"`
@@ -90,6 +90,9 @@ func (m *JUser) validateRegisteredFrom(formats strfmt.Registry) error {
 	if m.RegisteredFrom != nil {
 
 		if err := m.RegisteredFrom.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("registeredFrom")
+			}
 			return err
 		}
 	}

@@ -1,3 +1,4 @@
+uuid             = require 'uuid'
 async            = require 'async'
 jraphical        = require 'jraphical'
 Regions          = require 'koding-regions'
@@ -12,7 +13,6 @@ emailsanitize    = require './emailsanitize'
 
 module.exports = class JUser extends jraphical.Module
 
-  { v4: createId }      = require 'node-uuid'
   { Relationship }      = jraphical
   { secure, signature } = require 'bongo'
 
@@ -24,7 +24,6 @@ module.exports = class JUser extends jraphical.Module
   JLog                 = require '../log'
   ComputeProvider      = require '../computeproviders/computeprovider'
   Tracker              = require '../tracker'
-  Payment              = require '../payment'
 
   @bannedUserList = ['abrt', 'amykhailov', 'apache', 'about', 'visa', 'shared-',
                      'cthorn', 'daemon', 'dbus', 'dyasar', 'ec2-user', 'http',
@@ -773,17 +772,9 @@ module.exports = class JUser extends jraphical.Module
             }
 
             user.unlinkOAuths ->
-
-              Payment = require '../payment'
-
-              deletedClient = { connection: { delegate: account } }
-
-              Payment.deleteAccount deletedClient, (err) ->
-
-                account.leaveFromAllGroups client, ->
-
-                  JUser.logout deletedClient, callback
-
+              account.leaveFromAllGroups client, ->
+                deletedClient = { connection: { delegate: account } }
+                JUser.logout deletedClient, callback
 
   validateConvertInput = (userFormData, client) ->
 
@@ -851,7 +842,7 @@ module.exports = class JUser extends jraphical.Module
         # updating user passwordStatus if necessary
         updateUserPasswordStatus user, (err) ->
           return next err  if err
-          replacementToken = createId()
+          replacementToken = uuid.v4()
           next()
 
       (next) ->
@@ -1033,7 +1024,7 @@ module.exports = class JUser extends jraphical.Module
     account.profile = { nickname: username }
     account.type = 'unregistered'
 
-    callback null, { account, replacementToken: createId() }
+    callback null, { account, replacementToken: uuid.v4() }
 
 
   @createUser = (userInfo, callback) ->
@@ -1223,7 +1214,7 @@ module.exports = class JUser extends jraphical.Module
     account.changeUsername { username, isRegistration }, (err) ->
       return callback err   if err?
       return callback null  unless clientId?
-      newToken = createId()
+      newToken = uuid.v4()
       JSession.one { clientId }, (err, session) ->
         if err?
           return callback new KodingError 'Could not update your session'
@@ -1636,10 +1627,6 @@ module.exports = class JUser extends jraphical.Module
       args  = { user, group, pin, firstName, lastName }
       trackUserOnRegister disableCaptcha, args
 
-      SiftScience = require '../siftscience'
-      SiftScience.createAccount client, referrer, ->
-
-
   identifyUserOnRegister = (disableCaptcha, args) ->
 
     return  if disableCaptcha
@@ -1691,12 +1678,10 @@ module.exports = class JUser extends jraphical.Module
 
 
   @createJWT: (data, options = {}) ->
-    { secret, confirmExpiresInMinutes } = KONFIG.jwt
+    { secret, expiresIn } = KONFIG.jwt
 
     jwt = require 'jsonwebtoken'
-
-    # uses 'HS256' as default for signing
-    options.expiresInMinutes ?= confirmExpiresInMinutes
+    options.expiresIn ?= expiresIn
 
     return jwt.sign data, secret, options
 
@@ -1901,17 +1886,6 @@ module.exports = class JUser extends jraphical.Module
             callback null
 
             Tracker.identify @username, { email }
-
-
-  fetchHomepageView: (options, callback) ->
-
-    { account, bongoModels } = options
-
-    @fetchAccount 'koding', (err, account) ->
-      return callback err  if err
-      return callback new KodingError 'Account not found'  unless account
-      account.fetchHomepageView options, callback
-
 
   confirmEmail: (callback) ->
 

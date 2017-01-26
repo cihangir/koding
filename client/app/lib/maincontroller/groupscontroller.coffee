@@ -68,24 +68,6 @@ module.exports = class GroupsController extends kd.Controller
         rest = remote.revive rest
         @emit event, rest...
 
-  openGroupChannel: (group, callback = -> ) ->
-    @groupChannel = remote.subscribe "group.#{group.slug}",
-      serviceType : 'group'
-      group       : group.slug
-      isExclusive : yes
-
-    @filterXssAndForwardEvents @groupChannel, [
-      'MemberJoinedGroup'
-      'LikeIsAdded'
-      'PostIsCreated'
-      'ReplyIsAdded'
-      'PostIsDeleted'
-      'LikeIsRemoved'
-    ]
-
-    @groupChannel.once 'setSecretNames', callback
-
-
   openSocialGroupChannel: (group, callback = -> ) ->
     { realtime, socialapi } = kd.singletons
 
@@ -106,6 +88,8 @@ module.exports = class GroupsController extends kd.Controller
           'InstanceDeleted'
           'GroupDestroyed'
           'GroupJoined'
+          'MembershipRoleChanged'
+          'InvitationChanged'
           'GroupLeft'
           'StackAdminMessageCreated'
           'SharedStackTemplateAccessLevel'
@@ -129,7 +113,6 @@ module.exports = class GroupsController extends kd.Controller
           @setGroup groupName
           @currentGroupData.setGroup group
           callback null, groupName, group
-          @openGroupChannel getGroup()
           @openSocialGroupChannel getGroup()
           @emit 'ready'
 

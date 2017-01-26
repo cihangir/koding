@@ -14,6 +14,9 @@ import (
 // swagger:model JProposedDomain
 type JProposedDomain struct {
 
+	// id
+	ID string `json:"_id,omitempty"`
+
 	// domain
 	Domain string `json:"domain,omitempty"`
 
@@ -56,6 +59,10 @@ func (m *JProposedDomain) validateMachines(formats strfmt.Registry) error {
 		return nil
 	}
 
+	for i := 0; i < len(m.Machines); i++ {
+
+	}
+
 	return nil
 }
 
@@ -68,6 +75,9 @@ func (m *JProposedDomain) validateProxy(formats strfmt.Registry) error {
 	if m.Proxy != nil {
 
 		if err := m.Proxy.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("proxy")
+			}
 			return err
 		}
 	}

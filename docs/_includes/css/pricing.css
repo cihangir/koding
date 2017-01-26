@@ -706,6 +706,13 @@ a:hover {
   font-size: 18px;
   line-height: 26px;
 }
+.Pricing-PriceSegments--featureSection span.footprint.prominent i{
+  font-weight: 400;
+  background: #48BA7D;
+  color: white;
+  padding: 0 8px;
+  border-radius: 4px;
+}
 
 .Pricing-PriceSegments--featureItem {
   font-weight: 400;
@@ -804,6 +811,11 @@ a:hover {
 }
 .Pricing-PriceSegment--price span.first-line cite {
   font-size: 24px;
+}
+.Pricing-PriceSegment--price span.first-line i {
+  font-size: 24px;
+  font-weight: 300;
+  opacity: .5;
 }
 
 .Pricing-PriceSegment--price span.second-line {
@@ -938,7 +950,7 @@ a:hover {
   display: block;
   border-top: 1px solid #EBEBEB;
 }
-#Pricing-PriceSegments--devTeams {
+#Pricing-PriceSegments--kodingLite {
   z-index: 1;
   position: relative;
 }
@@ -1020,7 +1032,7 @@ a:hover {
 /* PRICING SEGMENTS */
 /* DEV TEAMS */
 
-.Pricing-PriceSegments section:first-child {
+.Pricing-PriceSegments section#Pricing-PriceSegments--kodingLite {
   margin-top: -150px;
   margin-bottom: 0;
 }
@@ -1179,6 +1191,11 @@ a:hover {
 .Pricing-Footnotes {
   background-color: #F9F9FB;
   border-top: 1px solid #EBEBEB;
+  padding: 60px 0 80px;
+}
+.Pricing-Footnotes section {
+  max-width: 1176px;
+  margin: 0 auto;
   text-align: left;
 }
 .Pricing-Footnotes h2 {
@@ -1208,7 +1225,6 @@ a:hover {
   color: rgba(127,126,157,0.70);
   letter-spacing: -0.17px;
   line-height: 20px;
-  margin-bottom: 20px;
 }
 .Pricing-Footnotes ul li a,
 .Pricing-Footnotes ul li a:visited {
@@ -1232,7 +1248,8 @@ a:hover {
 
 @media screen and (max-width: 1200px) {
   .Pricing-SupportPlans--support,
-  .Pricing-PriceSegments section {
+  .Pricing-PriceSegments section,
+  .Pricing-Footnotes section {
     max-width: 90%;
     min-width: 734px;
   }
@@ -1317,7 +1334,8 @@ a:hover {
 @media screen and (max-width: 768px) {
   .Pricing-SupportPlans--support,
   .Pricing-SupportPlans--quotes,
-  .Pricing-PriceSegments section {
+  .Pricing-PriceSegments section,
+  .Pricing-Footnotes section {
     min-width: 325px;
     max-width: 90%;
     float: none;

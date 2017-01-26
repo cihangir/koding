@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,11 +32,12 @@ var defaultCacheOpts = &config.CacheOptions{
 var DefaultClient = &Client{}
 
 type Client struct {
-	CacheOpts *config.CacheOptions
+	Cache     *config.Cache        // if nil, a new db will be opened during each operation
+	CacheOpts *config.CacheOptions // if nil, defaultCacheOpts are going to be used
+	Home      string               // uses config.KodingHome by default
+	Owner     *config.User         // uses config.CurrentUser by default
 
-	once     sync.Once // for c.init()
-	konfigID string
-	konfig   *config.Konfig
+	once sync.Once // for c.init()
 }
 
 type usedKonfig struct {
@@ -57,10 +60,19 @@ func (c *Client) Read(e *config.Environments) *config.Konfig {
 	k := config.NewKonfig(e)
 
 	_ = c.commit(func(cache *config.Cache) error {
-		var mixin config.Konfig
+		var used usedKonfig
+		var konfigs = make(config.Konfigs)
 
-		if err := cache.GetValue("konfig", &mixin); err == nil {
-			if err := mergeIn(k, &mixin); err != nil {
+		if err := cache.GetValue("konfigs.used", &used); err != nil {
+			return err
+		}
+
+		if err := cache.GetValue("konfigs", &konfigs); err != nil {
+			return err
+		}
+
+		if mixin, ok := konfigs[used.ID]; ok {
+			if err := mergeIn(k, mixin); err != nil {
 				return err
 			}
 		}
@@ -78,61 +90,25 @@ func (c *Client) Use(k *config.Konfig) error {
 		return err
 	}
 
-	id := k.ID()
-
-	return c.commit(func(cache *config.Cache) error {
-		konfigs := make(config.Konfigs)
-
-		if err := cache.GetValue("konfigs", &konfigs); isFatal(err) {
-			return err
-		}
-
-		konfigs[id] = k
-
-		return nonil(
-			cache.SetValue("konfigs", konfigs),
-			cache.SetValue("konfigs.used", &usedKonfig{ID: id}),
-		)
-	})
+	return c.commit(makeUseFunc(k))
 }
 
 func (c *Client) Used() (*config.Konfig, error) {
 	c.init()
 
-	var konfig *config.Konfig
+	var konfig config.Konfig
 
-	err := c.commit(func(cache *config.Cache) error {
-		var used usedKonfig
-
-		if err := cache.GetValue("konfigs.used", &used); err != nil {
-			return err
-		}
-
-		var konfigs config.Konfigs
-
-		if err := cache.GetValue("konfigs", &konfigs); err != nil {
-			return err
-		}
-
-		if k, ok := konfigs[used.ID]; ok {
-			konfig = k
-			return nil
-		}
-
-		return errors.New("config not found - use one that exists")
-	})
-
-	if err != nil {
+	if err := c.commit(makeUsedFunc(&konfig)); err != nil {
 		return nil, err
 	}
 
-	return konfig, nil
+	return &konfig, nil
 }
 
 func (c *Client) CacheOptions(app string) *config.CacheOptions {
 	c.init()
 
-	oldFile := filepath.Join(config.KodingHome(), app+".bolt")
+	oldFile := filepath.Join(c.home(), app+".bolt")
 	file := c.boltFile(app)
 
 	if _, err := os.Stat(file); oldFile != file && os.IsNotExist(err) {
@@ -152,7 +128,7 @@ func (c *Client) CacheOptions(app string) *config.CacheOptions {
 
 	// Best-effort attempts, ignore errors.
 	_ = os.MkdirAll(dir, 0755)
-	_ = util.Chown(dir, config.CurrentUser.User)
+	_ = util.Chown(dir, c.owner().User)
 
 	return &config.CacheOptions{
 		File: file,
@@ -194,54 +170,20 @@ func (c *Client) init() {
 }
 
 func (c *Client) initClient() {
-	// Best-effort attempt to ensure data in klient.bolt is consistent.
-	// Ignore any error, as there's no recovery from corrupted
-	// configuration, other than reinstalling kd / klient.
+	// TODO(rjeczalik): various migrations are perform in the init method
+	// to ensure old kd / klients that has old boltdb databases
+	// continue to work. When we're sure it's no longer needed, this
+	// code should be removed.
 	_ = c.commit(func(cache *config.Cache) error {
-		var used usedKonfig
-		var oldKonfig config.Konfig
-		var konfigs = make(config.Konfigs)
-
-		if err := cache.GetValue("konfig", &oldKonfig); isFatal(err) {
-			return err
-		}
-
-		if err := cache.GetValue("konfigs", &konfigs); isFatal(err) {
-			return err
-		}
-
-		if err := cache.GetValue("konfigs.used", &used); isFatal(err) {
-			return err
-		}
-
-		// If old konfig exists, try to migrate it over to konfigs.
-		if oldKonfig.Valid() == nil {
-			id := oldKonfig.ID()
-
-			if _, ok := konfigs[id]; !ok {
-				konfigs[id] = &oldKonfig
-
-				_ = cache.SetValue("konfigs", konfigs)
-			}
-		}
-
-		// If no konfig is in use (e.g. we just migrated one),
-		// try to set to the default one.
-		if used.ID == "" && len(konfigs) == 1 {
-			for id, konfig := range konfigs {
-				if konfig.Valid() == nil {
-					_ = cache.SetValue("konfigs.used", &usedKonfig{ID: id})
-				}
-				break
-			}
-		}
-
-		return nil
+		// Best-effort attempt to ensure data in klient.bolt is consistent.
+		// Ignore any error, as there's no recovery from corrupted
+		// configuration, other than reinstalling kd / klient.
+		return migrateKonfigBolt(cache)
 	})
 }
 
 func (c *Client) boltFile(app string) string {
-	if used, err := c.Used(); err == nil {
+	if used, err := c.Used(); err == nil && app != "konfig" {
 		return filepath.Join(config.KodingHome(), app+"."+used.ID()+".bolt")
 	}
 	return filepath.Join(config.KodingHome(), app+".bolt")
@@ -255,8 +197,169 @@ func (c *Client) cacheOpts() *config.CacheOptions {
 }
 
 func (c *Client) commit(fn func(*config.Cache) error) error {
+	if c.Cache != nil {
+		return fn(c.Cache)
+	}
+
 	cache := config.NewCache(c.cacheOpts())
 	return nonil(fn(cache), cache.Close())
+}
+
+func (c *Client) home() string {
+	if c.Home != "" {
+		return c.Home
+	}
+	return config.KodingHome()
+}
+
+func (c *Client) owner() *config.User {
+	if c.Owner != nil {
+		return c.Owner
+	}
+	return config.CurrentUser
+}
+
+func makeUsedFunc(konfig *config.Konfig) func(cache *config.Cache) error {
+	return func(cache *config.Cache) error {
+		var used usedKonfig
+
+		if err := cache.GetValue("konfigs.used", &used); err != nil {
+			return err
+		}
+
+		var konfigs config.Konfigs
+
+		if err := cache.GetValue("konfigs", &konfigs); err != nil {
+			return err
+		}
+
+		if k, ok := konfigs[used.ID]; ok {
+			*konfig = *k
+			return nil
+		}
+
+		return errors.New("config not found - use one that exists")
+	}
+}
+
+func makeUseFunc(konfig *config.Konfig) func(cache *config.Cache) error {
+	return func(cache *config.Cache) error {
+		konfigs := make(config.Konfigs)
+
+		if err := cache.GetValue("konfigs", &konfigs); isFatal(err) {
+			return err
+		}
+
+		id := konfig.ID()
+
+		konfigs[id] = konfig
+
+		return nonil(
+			cache.SetValue("konfigs", konfigs),
+			cache.SetValue("konfigs.used", &usedKonfig{ID: id}),
+		)
+	}
+}
+
+func migrateKonfigBolt(cache *config.Cache) error {
+	var used usedKonfig
+	var oldKonfig config.Konfig
+	var konfigs = make(config.Konfigs)
+
+	if err := cache.GetValue("konfig", &oldKonfig); isFatal(err) {
+		return err
+	}
+
+	if err := cache.GetValue("konfigs", &konfigs); isFatal(err) {
+		return err
+	}
+
+	if err := cache.GetValue("konfigs.used", &used); isFatal(err) {
+		return err
+	}
+
+	// If old konfig exists, try to migrate it over to konfigs.
+	if oldKonfig.Valid() == nil {
+		id := oldKonfig.ID()
+
+		if _, ok := konfigs[id]; !ok {
+			if oldKonfig.Endpoints == nil {
+				oldKonfig.Endpoints = &config.Endpoints{}
+			}
+
+			if u, err := url.Parse(oldKonfig.KontrolURL); err == nil && oldKonfig.KontrolURL != "" {
+				u.Path = ""
+				oldKonfig.Endpoints.Koding = config.NewEndpointURL(u)
+			}
+
+			if oldKonfig.TunnelURL != "" {
+				oldKonfig.Endpoints.Tunnel = config.NewEndpoint(oldKonfig.TunnelURL)
+			}
+
+			// Best-effort attemp to ensure /etc/kite/kite.key is stored
+			// in ~/.config/koding/konfig.bolt, so it is possible to
+			// use kd / konfig with koding deployments that sign with
+			// different kontrol keys, e.g. production <-> sandbox or
+			// production <-> self-hosted opensource version.
+			_ = migrateKiteKey(&oldKonfig)
+
+			konfigs[id] = &oldKonfig
+
+			_ = cache.SetValue("konfigs", konfigs)
+		}
+	}
+
+	// If no konfig is in use (e.g. we just migrated one),
+	// try to set to the default one.
+	if used.ID == "" && len(konfigs) == 1 {
+		for id, konfig := range konfigs {
+			if konfig.Valid() == nil {
+				_ = cache.SetValue("konfigs.used", &usedKonfig{ID: id})
+			}
+			break
+		}
+	}
+
+	return nil
+}
+
+func migrateKiteKey(konfig *config.Konfig) error {
+	// KiteKey already exists in the DB - we don't care
+	// whether it's our one or user overriden it explictely
+	// as long as it's there.
+	if konfig.KiteKey != "" {
+		return nil
+	}
+
+	defaultKitekey := config.NewKonfig(&config.Environments{Env: konfig.Environment}).KiteKeyFile
+	if defaultKitekey == "" {
+		defaultKitekey = filepath.FromSlash("/etc/kite/kite.key")
+	}
+
+	kitekey := konfig.KiteKeyFile
+
+	if kitekey == "" {
+		kitekey = defaultKitekey
+	}
+
+	if _, err := os.Stat(kitekey); err != nil {
+		// Either no access to the file or it does not exist,
+		// in either case nothing to do here.
+		return nil
+	}
+
+	p, err := ioutil.ReadFile(kitekey)
+	if err != nil {
+		return err
+	}
+
+	if konfig.KiteKeyFile == defaultKitekey {
+		konfig.KiteKeyFile = ""
+	}
+
+	konfig.KiteKey = string(p)
+
+	return nil
 }
 
 func isFatal(err error) bool {
@@ -272,7 +375,7 @@ func mergeIn(kfg, mixin *config.Konfig) error {
 	return json.Unmarshal(p, kfg)
 }
 
-func setFlatKeyValue(m map[string]interface{}, key, value string) error {
+func SetFlatKeyValue(m map[string]interface{}, key, value string) error {
 	keys := strings.Split(key, ".")
 	it := m
 	last := len(keys) - 1
@@ -311,7 +414,7 @@ func setKonfig(cfg *config.Konfig, key, value string) error {
 		return err
 	}
 
-	if err := setFlatKeyValue(m, key, value); err != nil {
+	if err := SetFlatKeyValue(m, key, value); err != nil {
 		return err
 	}
 

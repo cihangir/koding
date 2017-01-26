@@ -8,40 +8,45 @@ import (
 	"testing"
 
 	"koding/kites/kloud/stack"
-	"koding/klientctl/endpoint/auth"
 	"koding/klientctl/endpoint/team"
 )
 
 func TestAuthLogin(t *testing.T) {
 	cases := map[string]struct {
-		team    *team.Team
-		session *auth.Session
+		team *team.Team
+		resp *stack.LoginResponse
 	}{
 		"foobar team": {
 			&team.Team{Name: "foobar"},
-			&auth.Session{
-				Team:     "foobar",
-				ClientID: "abcd-efgh-ijk-lmn",
+			&stack.LoginResponse{
+				GroupName: "foobar",
+				Username:  "user",
+				ClientID:  "abcd-efgh-ijk-lmn",
 			},
 		},
 		"barbaz team": {
 			&team.Team{Name: "barbaz"},
-			&auth.Session{
-				Team:     "barbaz",
-				ClientID: "abcd-efgh-ijk-lmn",
+			&stack.LoginResponse{
+				GroupName: "barbaz",
+				Username:  "user",
+				ClientID:  "abcd-efgh-ijk-lmn",
 			},
 		},
 		"hebele team": {
 			&team.Team{Name: "hebele"},
-			&auth.Session{
-				Team:     "hebele",
-				ClientID: "abcd-efgh-ijk-lmn",
+			&stack.LoginResponse{
+				GroupName: "hebele",
+				Username:  "user",
+				ClientID:  "abcd-efgh-ijk-lmn",
 			},
 		},
 	}
 
 	for name, cas := range cases {
+		// capture range variable here
+		cas := cas
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			var buf bytes.Buffer
 
 			cmd := &MainCmd{
@@ -50,10 +55,7 @@ func TestAuthLogin(t *testing.T) {
 			}
 
 			cmd.FT.Add("kite.print", nil)
-			cmd.FT.Add("auth.login", &stack.LoginResponse{
-				GroupName: cas.session.Team,
-				ClientID:  cas.session.ClientID,
-			})
+			cmd.FT.Add("auth.login", cas.resp)
 
 			err := cmd.Run("auth", "login",
 				"--team", cas.team.Name,
@@ -64,14 +66,14 @@ func TestAuthLogin(t *testing.T) {
 				t.Fatalf("Run()=%s", err)
 			}
 
-			var got auth.Session
+			var got stack.LoginResponse
 
 			if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
 				t.Fatalf("Unmarshal()=%s", err)
 			}
 
-			if !reflect.DeepEqual(&got, cas.session) {
-				t.Fatalf("got %#v, want %#v", &got, cas.session)
+			if !reflect.DeepEqual(&got, cas.resp) {
+				t.Fatalf("got %#v, want %#v", &got, cas.resp)
 			}
 
 			buf.Reset()
@@ -86,6 +88,57 @@ func TestAuthLogin(t *testing.T) {
 
 			if !reflect.DeepEqual(&gotTeam, cas.team) {
 				t.Fatalf("got %#v, want %#v", &got, cas.team)
+			}
+		})
+	}
+}
+
+func TestAuthLoginToken(t *testing.T) {
+	cases := map[string]*stack.PasswordLoginResponse{
+		"without team": {
+			KiteKey: "abc",
+		},
+		"with team": {
+			LoginResponse: stack.LoginResponse{
+				GroupName: "foobar",
+			},
+			KiteKey: "123",
+		},
+	}
+
+	for name, cas := range cases {
+		// capture range variable here
+		cas := cas
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			var buf bytes.Buffer
+
+			cmd := &MainCmd{
+				Stdout: &buf,
+				Stderr: os.Stderr,
+			}
+
+			cmd.FT.Add("kite.print", nil)
+			cmd.FT.Add("registerMachine", cas.KiteKey)
+
+			err := cmd.Run("auth", "login",
+				"--team", cas.GroupName,
+				"--token", "test-token",
+				"--json",
+			)
+
+			if err != nil {
+				t.Fatalf("Run()=%s", err)
+			}
+
+			var got stack.PasswordLoginResponse
+
+			if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+				t.Fatalf("Unmarshal()=%s", err)
+			}
+
+			if !reflect.DeepEqual(&got, cas) {
+				t.Fatalf("got %#v, want %#v", &got, cas)
 			}
 		})
 	}

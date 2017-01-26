@@ -13,20 +13,17 @@ bongo = require 'app/redux/modules/bongo'
 SubscriptionSection = require './subscriptionsection'
 
 
-trialTitles =
-  7: "Koding Basic Trial (1 Week)"
-  30: 'Koding Basic Trial (1 Month)'
-
-
 subscriptionTitle = createSelector(
-  subscription.pricePerSeat
-  subscription.isTrial
-  subscription.trialDays
+  subscription.planAmount
   info.userCount
-  (pricePerSeat, isTrial, trialDays, userCount) ->
-    if isTrial
-    then trialTitles[trialDays]
-    else "$#{pricePerSeat} per Developer (#{pluralize 'Developer', userCount, yes})"
+  (amount, userCount) ->
+    name = "$#{amount.toString()} Plan"
+
+    type = if userCount is 1 then 'Solo'
+    else if userCount <= 10 then 'Single Cloud'
+    else 'Dev Team'
+
+    return "#{name} (#{type})"
 )
 
 
@@ -50,8 +47,13 @@ isEmailVerified = createSelector(
 
 
 mapStateToProps = (state) ->
+
+  title = if globals.hasCreditCard
+  then subscriptionTitle(state)
+  else 'Cancelled Subscription'
+
   return {
-    title: subscriptionTitle(state)
+    title: title
     pricePerSeat: subscription.pricePerSeat(state)
     teamSize: info.userCount(state)
     endsAt: info.endsAt(state)
@@ -73,4 +75,3 @@ mapDispatchToProps = (dispatch) ->
 
 
 module.exports = connect(mapStateToProps, mapDispatchToProps)(SubscriptionSection)
-

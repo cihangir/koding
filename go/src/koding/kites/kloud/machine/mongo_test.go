@@ -62,7 +62,7 @@ func prepareMongoMachines() error {
 				State:  "running",
 				Reason: "because it can",
 			},
-			GeneratedFrom: models.MachineGeneratedFrom{
+			GeneratedFrom: &models.MachineGeneratedFrom{
 				TemplateId: boberStack,
 			},
 		},
@@ -87,7 +87,7 @@ func prepareMongoMachines() error {
 					Username: blaster,
 				},
 			},
-			GeneratedFrom: models.MachineGeneratedFrom{
+			GeneratedFrom: &models.MachineGeneratedFrom{
 				TemplateId: boberStack,
 			},
 		},
@@ -111,7 +111,7 @@ func prepareMongoMachines() error {
 					Username: blaster,
 				},
 			},
-			GeneratedFrom: models.MachineGeneratedFrom{
+			GeneratedFrom: &models.MachineGeneratedFrom{
 				TemplateId: johnStack,
 			},
 		},
@@ -126,7 +126,7 @@ func prepareMongoMachines() error {
 					Username: blaster,
 				},
 			},
-			GeneratedFrom: models.MachineGeneratedFrom{
+			GeneratedFrom: &models.MachineGeneratedFrom{
 				TemplateId: blasterStack,
 			},
 		},
@@ -359,7 +359,10 @@ func TestMongoDatabase(t *testing.T) {
 
 	mongoDB := NewMongoDatabase()
 	for _, test := range tests {
+		// capture range variable here
+		test := test
 		t.Run(test.Name, func(t *testing.T) {
+			t.Parallel()
 			machines, err := mongoDB.Machines(test.Filter)
 			if (err == nil) != test.IsValid {
 				t.Fatalf("want valid test = %t; got err: %v", test.IsValid, err)

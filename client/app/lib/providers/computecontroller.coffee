@@ -6,7 +6,6 @@ kd                   = require 'kd'
 KDController         = kd.Controller
 
 nick                 = require 'app/util/nick'
-isKoding             = require 'app/util/isKoding'
 FSHelper             = require 'app/util/fs/fshelper'
 showError            = require 'app/util/showError'
 isLoggedIn           = require 'app/util/isLoggedIn'
@@ -26,9 +25,11 @@ createShareModal     = require 'stack-editor/editor/createShareModal'
 isGroupDisabled      = require 'app/util/isGroupDisabled'
 ContentModal         = require 'app/components/contentModal'
 runMiddlewares       = require 'app/util/runMiddlewares'
+SidebarFlux          = require 'app/flux/sidebar'
+whoami               = require 'app/util/whoami'
+
 TestMachineMiddleware = require './middlewares/testmachine'
 
-whoami = require 'app/util/whoami'
 
 { actions : HomeActions } = require 'home/flux'
 require './config'
@@ -37,7 +38,7 @@ require './config'
 module.exports = class ComputeController extends KDController
 
 
-  @providers = globals.config.providers._getSupportedProviders()
+  PROVIDERS  = globals.config.providers._getSupportedProviders()
   @Error     = {
     'TimeoutError', 'KiteError', 'NotSupported'
     Pending: '107', NotVerified: '500'
@@ -371,9 +372,6 @@ module.exports = class ComputeController extends KDController
 
   fetchUsage: (options, callback) ->
     remote.api.ComputeProvider.fetchUsage options, callback
-
-
-  fetchUserPlan: (callback = kd.noop) -> callback 'free'
 
 
   fetchRewards: (options, callback) ->
@@ -979,8 +977,6 @@ module.exports = class ComputeController extends KDController
 
   checkStackRevisions: ->
 
-    return  if isKoding()
-
     # TMS-1919: This is already written for multiple stacks, code change
     # might be required if existing flow changes ~ GG
 
@@ -1017,13 +1013,18 @@ module.exports = class ComputeController extends KDController
         new kd.NotificationView { title : 'Stack Template is Shared With Team' }
         @checkRevisionFromOriginalStackTemplate stackTemplate
       else
-        @removeRevisonFromUnSharedStackTemplate _id
+        @removeRevisonFromUnSharedStackTemplate _id, stackTemplate
         new kd.NotificationView { title : 'Stack Template is Unshared With Team' }
 
 
-  removeRevisonFromUnSharedStackTemplate: (id) ->
+  removeRevisonFromUnSharedStackTemplate: (id, stackTemplate) ->
 
     { reactor } = kd.singletons
+
+    if stackTemplate
+      reactor.dispatch 'UPDATE_PRIVATE_STACK_TEMPLATE_SUCCESS', { stackTemplate }
+      SidebarFlux.actions.makeVisible 'draft', id
+
     stacks = @stacks.filter (stack) -> stack.config?.clonedFrom is id
 
     stacks.forEach (stack) =>
@@ -1037,6 +1038,8 @@ module.exports = class ComputeController extends KDController
     { reactor } = kd.singletons
 
     reactor.dispatch 'UPDATE_TEAM_STACK_TEMPLATE_SUCCESS', { stackTemplate }
+    if whoami()._id is stackTemplate.originId
+      SidebarFlux.actions.makeVisible 'draft', stackTemplate._id
 
     stacks = @stacks.filter (stack) ->
       stack.config?.clonedFrom is stackTemplate._id
@@ -1085,7 +1088,6 @@ module.exports = class ComputeController extends KDController
 
   checkGroupStackRevisions: ->
 
-    return  if isKoding()
     return  if not @stacks?.length
 
     { groupsController } = kd.singletons
@@ -1225,9 +1227,6 @@ module.exports = class ComputeController extends KDController
 
   showBuildLogs: (machine, tailOffset) ->
 
-    # Not supported for Koding Group
-    return  if isKoding()
-
     # Path of cloud-init-output log
     path = '/var/log/cloud-init-output.log'
     file = FSHelper.createFileInstance { path, machine }
@@ -1249,7 +1248,6 @@ module.exports = class ComputeController extends KDController
   ###
   getGroupStack: ->
 
-    return null  if isKoding() # we may need this for Koding group as well ~ GG
     return null  if not @stacks?.length
 
     { groupsController } = kd.singletons
@@ -1301,7 +1299,7 @@ module.exports = class ComputeController extends KDController
   shareCredentials: (credentials, requiredProviders, callback) ->
 
     selectedProvider = null
-    for provider in requiredProviders when provider in @providers
+    for provider in requiredProviders when provider in PROVIDERS
       selectedProvider = provider
     selectedProvider ?= (Object.keys credentials ? { aws: yes }).first
 
